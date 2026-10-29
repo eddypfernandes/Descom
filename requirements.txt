@@ -1,0 +1,2 @@
+# DESCOM começa utilizando a biblioteca padrão do Python.
+# Adicione dependências externas somente quando uma fonte aprovada exigir.
