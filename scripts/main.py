@@ -10,6 +10,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,7 +112,7 @@ def candidate_to_record(item: dict[str, Any], category: str, timestamp: str) -> 
         "description": description or None,
         "address": {
             "street": None, "number": None, "complement": None,
-            "neighborhood": REGION, "city": CITY, "state": UF, "postal_code": None
+            "neighborhood": None, "city": CITY, "state": UF, "postal_code": None
         },
         "contacts": {"phone": None, "whatsapp": None, "website": None, "email": None, "public_profile": url},
         "location": {"latitude": None, "longitude": None},
@@ -123,6 +124,42 @@ def candidate_to_record(item: dict[str, Any], category: str, timestamp: str) -> 
         "merchant_claim": {"claimed": False, "verified": False, "declared_at": None},
     }
 
+
+
+AGGREGATOR_HOSTS = (
+    "tripadvisor.", "yelp.", "wikipedia.org", "instagram.com",
+    "facebook.com", "consed.org.br", "cbm.df.gov.br",
+    "centro-oeste-do-brasil-hoteis.com",
+)
+GENERIC_TITLE_TERMS = (
+    "top 10", "os 10 melhores", "melhores restaurantes", "listas para",
+    "oferta de cursos", "regiões administrativas", "lista de empresas",
+    "empresas brigadas ativas", "resultados para",
+)
+
+
+def eligible_for_carousel(record: dict[str, Any]) -> bool:
+    """Só libera estabelecimentos individuais com validação concluída."""
+    name = str(record.get("name") or "").strip().casefold()
+    validation = record.get("validation") or {}
+    sources = record.get("sources") or []
+    if validation.get("status") != "verified":
+        return False
+    if not name or any(term in name for term in GENERIC_TITLE_TERMS):
+        return False
+    if len(name.split()) < 2 or not sources:
+        return False
+    urls = [str(source.get("url") or "") for source in sources if isinstance(source, dict)]
+    if not urls:
+        return False
+    for url in urls:
+        host = (urlsplit(url).hostname or "").casefold()
+        if not host or any(blocked in host for blocked in AGGREGATOR_HOSTS):
+            continue
+        if host.endswith(".gov.br") or host.endswith(".gov"):
+            continue
+        return True
+    return False
 
 def atomic_write(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -170,8 +207,8 @@ def run_search(api_key: str) -> tuple[int, int]:
     if errors:
         raise ValueError("Base não foi gravada: " + "; ".join(errors))
 
-    # O arquivo completo é a fonte principal; o carousel é apenas uma seleção dele.
-    carousel_records = all_records[:max(10, min(len(all_records), 20))]
+    # A base preserva todos os candidatos; o carousel recebe apenas empresas verificadas.
+    carousel_records = [record for record in all_records if eligible_for_carousel(record)][:20]
     carousel = {
         "schema_version": "1.0",
         "generated_at": timestamp,
@@ -187,7 +224,7 @@ def run_search(api_key: str) -> tuple[int, int]:
     print(f"Total na base: {len(all_records)}")
     print(f"Cards no carousel: {len(carousel_records)}")
     if len(carousel_records) < 10:
-        print("AVISO: ainda não há 10 candidatos territoriais; nenhum registro foi inventado.")
+        print("AVISO: menos de 10 empresas verificadas; o carousel deve permanecer em estado de espera.")
     return len(all_records), len(carousel_records)
 
 
