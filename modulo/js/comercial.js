@@ -19,6 +19,24 @@
     });
   }
 
+  function formatarDescricao(valor) {
+    let descricao = String(valor ?? "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s*Read more\s*\.?$/i, "")
+      .replace(/\s+/g, " ")
+      .replace(/^[A-Z][a-z]{2,8}\s+\d{1,2},\s+\d{4}\s*[—–-]\s*/, "")
+      .replace(/\s*[…]+\s*$/, "")
+      .trim();
+
+    const conteudoIrrelevante = /^(?:\d+\.|OS?\s+\d+\s+MELHORES|TOP\s+\d+|LISTAS PARA O SITE)|promoção especial|regiões administrativas do distrito federal|oferta de cursos de idiomas/i;
+
+    if (!descricao || conteudoIrrelevante.test(descricao)) {
+      return "Informações públicas localizadas. Cadastro em análise.";
+    }
+
+    return descricao;
+  }
+
   let instanciaCarousel;
 
   function quantidadePorSlide() {
@@ -48,7 +66,7 @@
 
     const slides = grupos.map((grupo, indice) => {
       const cardsHtml = grupo.map((item, posicao) => {
-        const descricao = item.description || "Descrição ainda não disponível.";
+        const descricao = formatarDescricao(item.description);
         const regiao = item.address && item.address.neighborhood
           ? item.address.neighborhood + " · DF"
           : "Região em identificação";
