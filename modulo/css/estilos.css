@@ -160,6 +160,14 @@ body {
   background: transparent;
 }
 
+.descom-card-visual {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #edf0ec;
+}
+
 .descom-card-imagem {
   display: block;
   width: 100%;
@@ -173,22 +181,30 @@ body {
   background: #edf0ec;
 }
 
-.descom-card-topo {
-  display: flex;
+.descom-card-overlay {
+  position: absolute;
+  top: .75rem;
+  right: .75rem;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: .8rem 0 .55rem;
+  gap: .45rem;
+  padding: .4rem .65rem;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 2rem;
+  background: rgb(23 63 53 / 82%);
+  color: #fff;
+  backdrop-filter: blur(4px);
 }
 
 .descom-card-numero {
-  color: #929d95;
+  color: #fff;
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .09em;
 }
 
 .descom-card-status {
-  color: #82734f;
+  color: #fff;
   font-size: .62rem;
   font-weight: 600;
   letter-spacing: .04em;
