@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comercial | Guia Comercial</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root{--verde:#173f35;--hover:#245648;--ouro:#e9a83b;--fundo:#f7f8f5;--texto:#28352f;--suave:#68736c;--borda:#e4e9e3}
+body{background:var(--fundo);color:var(--texto)}.topo{background:#fff;border-bottom:1px solid var(--borda)}
+.marca{font-size:1.35rem;font-weight:750;letter-spacing:-.04em;color:var(--verde);text-decoration:none}.marca span{color:var(--ouro)}
+.nav-link{color:#48564e;font-size:.94rem}.nav-link.active,.nav-link:hover{color:var(--verde)}
+.btn-guia{background:var(--verde);border-color:var(--verde);color:#fff}.btn-guia:hover{background:var(--hover);border-color:var(--hover);color:#fff}
+.hero{background:linear-gradient(115deg,#173f35,#245648 72%,#2d6655);color:#fff}.hero .eyebrow{color:#e9c27f;font-size:.76rem;letter-spacing:.09em;font-weight:600}
+.hero h1{font-weight:700;letter-spacing:-.035em}.hero p{color:#ffffffc7;max-width:610px}
+.busca{background:#fff;border-radius:.8rem;padding:.45rem;box-shadow:0 12px 32px #0002}.busca .form-control{border:0;box-shadow:none;min-height:46px}
+.breadcrumb{font-size:.84rem;margin:0}.breadcrumb a{color:var(--suave);text-decoration:none}.breadcrumb-item.active{color:var(--verde)}
+.titulo{font-weight:700;letter-spacing:-.025em}.suave{color:var(--suave)}
+.filtros{display:flex;gap:.5rem;overflow-x:auto;padding:.15rem .1rem .55rem;scrollbar-width:thin}
+.filtro{white-space:nowrap;border:1px solid var(--borda);background:#fff;color:#46534c;font-size:.875rem;padding:.48rem .85rem;border-radius:2rem}
+.filtro:hover,.filtro.active{background:var(--verde);color:#fff;border-color:var(--verde)}
+.card-guia{border:1px solid var(--borda);border-radius:.85rem;background:#fff;height:100%;transition:transform .18s,box-shadow .18s;overflow:hidden}
+.card-guia:hover{transform:translateY(-3px);box-shadow:0 12px 28px #173f3514}
+.card-visual{min-height:105px;background:linear-gradient(135deg,#edf2ed,#f8f8f4);border-bottom:1px solid var(--borda);display:grid;place-items:center;position:relative}
+.card-icone{width:54px;height:54px;display:grid;place-items:center;border-radius:1rem;background:#fff;color:var(--verde);font-size:1.45rem;box-shadow:0 4px 14px #173f3512}
+.selo{position:absolute;top:.7rem;right:.7rem;font-size:.68rem;padding:.32rem .55rem;border-radius:2rem;background:#fff;color:var(--verde);border:1px solid var(--borda)}
+.card-guia .card-body{padding:1.1rem}.categoria{font-size:.76rem;color:var(--suave);margin-bottom:.4rem}
+.card-guia h3{font-size:1.05rem;font-weight:650;margin-bottom:.55rem}.card-guia p{color:var(--suave);font-size:.88rem;line-height:1.5;margin-bottom:.9rem}
+.card-local{color:var(--suave);font-size:.8rem;border-top:1px solid var(--borda);padding:.75rem 1.1rem}
+.link-guia{color:var(--verde);text-decoration:none;font-size:.88rem;font-weight:600}.link-guia:hover{color:var(--hover)}
+.rodape{background:var(--verde);color:#ffffffc7}.rodape a{color:#ffffffd1;text-decoration:none}.rodape a:hover{color:#fff}
+.pagination{--bs-pagination-color:var(--verde);--bs-pagination-hover-color:var(--hover);--bs-pagination-active-bg:var(--verde);--bs-pagination-active-border-color:var(--verde)}
+@media(max-width:575.98px){.hero{text-align:center}.busca{padding:.65rem}.busca .form-control{border-bottom:1px solid var(--borda)}}
+</style>
+</head>
+<body>
+<header class="topo">
+<section><div class="container"><div class="col-12"><div class="row align-items-center py-3 g-3">
+<div class="col-12 col-lg-3"><a class="marca" href="../">guia<span>.</span>comercial</a></div>
+<div class="col-12 col-lg-9"><nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
+<button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse justify-content-lg-end" id="menu"><ul class="navbar-nav align-items-lg-center gap-lg-2">
+<li class="nav-item"><a class="nav-link" href="../">Início</a></li><li class="nav-item"><a class="nav-link active" href="comercial.html">Empresas</a></li><li class="nav-item"><a class="nav-link" href="#">Categorias</a></li><li class="nav-item"><a class="nav-link" href="#">Editorial</a></li><li class="nav-item ms-lg-2"><a class="btn btn-sm btn-guia px-3" href="#">Sou comerciante</a></li>
+</ul></div></nav></div>
+</div></div></div></section>
+</header>
+<main>
+<section class="hero py-5"><div class="container"><div class="col-12"><div class="row align-items-center gy-4">
+<div class="col-12 col-lg-7"><div class="eyebrow mb-2">GUIA COMERCIAL · NÚCLEO BANDEIRANTE</div><h1 class="display-5 mb-3">Encontre o que você procura, perto de você.</h1><p class="mb-0">Conheça empresas, serviços e profissionais da região. Pesquise por nome ou explore as categorias para descobrir novas opções.</p></div>
+<div class="col-12 col-lg-5"><form class="busca" id="formBusca"><div class="row g-1 align-items-center">
+<div class="col-12 col-md"><label class="visually-hidden" for="busca">O que você procura?</label><input class="form-control" id="busca" type="search" placeholder="Nome, serviço ou atividade"></div>
+<div class="col-12 col-md-auto"><button class="btn btn-guia w-100 px-4 py-2" type="submit"><i class="bi bi-search me-1"></i>Buscar</button></div>
+</div></form></div>
+</div></div></div></section>
+<section class="py-3 bg-white border-bottom"><div class="container"><div class="col-12"><div class="row"><div class="col-12"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../">Início</a></li><li class="breadcrumb-item active" aria-current="page">Comercial</li></ol></nav></div></div></div></div></section>
+<section class="py-4 py-lg-5"><div class="container"><div class="col-12"><div class="row g-4">
+<div class="col-12"><div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3"><div><h2 class="h4 titulo mb-1">Explore por categoria</h2><p class="small suave mb-0">Encontre estabelecimentos pelo tipo de atividade.</p></div><span class="small suave">Núcleo Bandeirante · DF</span></div><div class="filtros" id="filtros"><button class="filtro active" data-cat="Todas" type="button">Todas</button></div></div>
+<div class="col-12"><div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><div><h2 class="h4 titulo mb-1">Estabelecimentos da região</h2><p class="small suave mb-0" id="total">Carregando estabelecimentos...</p></div><div class="d-flex align-items-center gap-2"><label class="small suave" for="ordem">Ordenar</label><select class="form-select form-select-sm" id="ordem" style="width:auto"><option value="nome">Nome</option><option value="categoria">Categoria</option></select></div></div>
+<div class="row g-3" id="cards"><div class="col-12 text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Carregando...</span></div><p class="small suave mt-3 mb-0">Consultando os estabelecimentos do Guia.</p></div></div>
+<div class="alert alert-light border mt-3 d-none" id="vazio">Nenhum estabelecimento corresponde à pesquisa. Tente outro termo ou categoria.</div>
+<div class="alert alert-warning border mt-3 d-none" id="erro">Não foi possível carregar os estabelecimentos neste momento. Tente novamente mais tarde.</div>
+<nav class="mt-4" aria-label="Paginação de estabelecimentos"><ul class="pagination pagination-sm justify-content-center mb-0" id="paginacao"></ul></nav>
+</div>
+</div></div></div></section>
+</main>
+<footer class="rodape py-4"><section><div class="container"><div class="col-12"><div class="row gy-3 align-items-center">
+<div class="col-12 col-md-6"><div class="text-white fw-semibold mb-1">Guia Comercial</div><div class="small">Conectando pessoas, empresas e oportunidades no Núcleo Bandeirante.</div></div>
+<div class="col-12 col-md-6 text-md-end small"><a href="#" class="me-3">Sobre o Guia</a><a href="#" class="me-3">Sou comerciante</a><a href="#">Contato</a></div>
+</div><hr class="border-light opacity-25 my-3"><div class="small text-center">© 2026 Guia Comercial. Todos os direitos reservados.</div></div></div></section></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+const URL_JSON='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/estabelecimentos.json';
+const POR_PAGINA=9;
+const busca=document.getElementById('busca'),filtros=document.getElementById('filtros'),cards=document.getElementById('cards'),total=document.getElementById('total'),vazio=document.getElementById('vazio'),erro=document.getElementById('erro'),ordem=document.getElementById('ordem'),paginacao=document.getElementById('paginacao');
+let estabelecimentos=[],filtrados=[],categoria='Todas',pagina=1;
+const icones={'alimentação':'bi-cup-hot','comércio':'bi-shop','saúde e bem-estar':'bi-heart-pulse','serviços':'bi-briefcase','automotivo':'bi-car-front','educação e cultura':'bi-book','hospedagem e lazer':'bi-buildings'};
+function normalizar(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim()}
+function escapar(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function urlValida(v){try{const u=new URL(v);return ['https:','http:'].includes(u.protocol)?u.href:''}catch(e){return ''}}
+function fontes(item){return (Array.isArray(item.sources)?item.sources:[]).map(f=>typeof f==='string'?f:(f.url||f.source_url||'')).filter(Boolean)}
+function registroIndesejado(item){
+const nome=normalizar(item.name),desc=normalizar(item.description),urls=fontes(item).map(normalizar);
+const termos=['os 10 melhores','top 10','listas para o site','regioes administrativas','oferta de cursos','lista de brigadas'];
+if(!nome||nome.length>90||termos.some(t=>nome.includes(t)))return true;
+if(urls.some(u=>u.includes('tripadvisor.com.br/restaurants')||u.includes('yelp.com/search')||u.includes('wikipedia.org')||u.includes('consed.org.br')||u.endsWith('.pdf')||u.includes('instagram.com/reel/')))return true;
+return ['os melhores restaurantes','regioes administrativas do distrito federal','oferta de cursos de idiomas','listas para o site'].some(t=>desc.includes(t));
+}
+function classificar(v){
+const t=normalizar(v);
+if(/restaurante|aliment|lanch|bar|caf|padaria|confeit|pizz|gastronom/.test(t))return 'Alimentação';
+if(/academia|saude|clinica|medic|odont|farmac|fisioter|bem estar|estetica/.test(t))return 'Saúde e bem-estar';
+if(/hotel|hosped|pousada|lazer|turismo/.test(t))return 'Hospedagem e lazer';
+if(/automot|veiculo|mecanica|oficina|lava.?jato|autopeca/.test(t))return 'Automotivo';
+if(/educa|escola|curso|cultura|idioma|ensino/.test(t))return 'Educação e cultura';
+if(/comerc|loja|varejo|mercado|material de construcao/.test(t))return 'Comércio';
+if(/servic|profission|consultor|contabil|advocacia/.test(t))return 'Serviços';
+return v?String(v).trim():'Outros';
+}
+function endereco(item){const a=item.address||{},p=[a.neighborhood,a.city,a.state].filter(Boolean);return p.length?p.join(' · '):'Núcleo Bandeirante · Brasília, DF'}
+function link(item){const c=item.contacts||{};return urlValida(c.public_profile)||urlValida(c.website)}
+function montarCard(item){
+const status=normalizar(item.validation&&item.validation.status)==='verified'?'Informações verificadas':'Cadastro em análise';
+const destino=link(item);
+const acao=destino?'<a class="link-guia" href="'+escapar(destino)+'" target="_blank" rel="noopener noreferrer">Ver estabelecimento <i class="bi bi-arrow-up-right"></i></a>':'<span class="small suave">Contato ainda não informado</span>';
+const icone='bi '+(icones[normalizar(item.categoria)]||'bi-shop');
+return '<div class="col-12 col-md-6 col-lg-4 item"><article class="card-guia"><div class="card-visual"><span class="card-icone"><i class="'+icone+'"></i></span><span class="selo">'+status+'</span></div><div class="card-body"><div class="categoria">'+escapar(item.categoria)+'</div><h3>'+escapar(item.name)+'</h3><p>'+escapar(item.description||'Informações públicas localizadas. Cadastro em análise.')+'</p>'+acao+'</div><div class="card-local"><i class="bi bi-geo-alt me-1"></i>'+escapar(endereco(item))+'</div></article></div>';
+}
+function montarFiltros(){
+const cats=[...new Set(estabelecimentos.map(i=>i.categoria))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+filtros.innerHTML='<button class="filtro active" data-cat="Todas" type="button">Todas</button>';
+cats.forEach(c=>filtros.insertAdjacentHTML('beforeend','<button class="filtro" data-cat="'+escapar(c)+'" type="button">'+escapar(c)+'</button>'));
+filtros.querySelectorAll('.filtro').forEach(b=>b.addEventListener('click',()=>{filtros.querySelectorAll('.filtro').forEach(x=>x.classList.remove('active'));b.classList.add('active');categoria=b.dataset.cat;pagina=1;filtrar()}));
+}
+function filtrar(){
+const termo=normalizar(busca.value);
+filtrados=estabelecimentos.filter(i=>(categoria==='Todas'||i.categoria===categoria)&&(!termo||normalizar([i.name,i.categoria,i.description,endereco(i)].join(' ')).includes(termo)));
+ordenar();pagina=1;renderizar();
+}
+function ordenar(){
+const k=ordem.value;
+filtrados.sort((a,b)=>k==='categoria'?(a.categoria.localeCompare(b.categoria,'pt-BR')||a.name.localeCompare(b.name,'pt-BR')):a.name.localeCompare(b.name,'pt-BR'));
+}
+function renderizar(){
+const qtd=filtrados.length,pags=Math.ceil(qtd/POR_PAGINA);
+if(pagina>pags&&pags)pagina=pags;
+cards.innerHTML=filtrados.slice((pagina-1)*POR_PAGINA,pagina*POR_PAGINA).map(montarCard).join('');
+total.textContent=qtd+(qtd===1?' estabelecimento encontrado':' estabelecimentos encontrados');
+vazio.classList.toggle('d-none',qtd>0);paginacao.innerHTML='';
+if(!qtd)return;
+function botao(txt,dest,disabled,active){
+const li=document.createElement('li');li.className='page-item'+(disabled?' disabled':'')+(active?' active':'');
+const b=document.createElement('button');b.type='button';b.className='page-link';b.textContent=txt;b.disabled=disabled;if(active)b.setAttribute('aria-current','page');
+b.addEventListener('click',()=>{pagina=dest;renderizar()});li.appendChild(b);paginacao.appendChild(li);
+}
+botao('Anterior',pagina-1,pagina===1,false);
+for(let i=1;i<=pags;i++)botao(String(i),i,false,i===pagina);
+botao('Próxima',pagina+1,pagina===pags,false);
+}
+async function carregar(){
+erro.classList.add('d-none');
+try{
+const r=await fetch(URL_JSON,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);
+const dados=await r.json();if(!dados||!Array.isArray(dados.establishments))throw new Error('JSON inválido');
+estabelecimentos=dados.establishments.filter(i=>i&&i.name&&!registroIndesejado(i)).map(i=>({...i,categoria:classificar(i.category)}));
+montarFiltros();filtrar();
+if(!estabelecimentos.length)total.textContent='Nenhum estabelecimento disponível no momento.';
+}catch(e){cards.innerHTML='';total.textContent='Não foi possível consultar a base de estabelecimentos.';erro.classList.remove('d-none');paginacao.innerHTML=''}
+}
+document.getElementById('formBusca').addEventListener('submit',e=>{e.preventDefault();filtrar()});
+busca.addEventListener('input',filtrar);
+ordem.addEventListener('change',()=>{ordenar();pagina=1;renderizar()});
+carregar();
+})();
+</script>
+</body>
+</html>
