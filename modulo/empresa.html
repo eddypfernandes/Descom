@@ -35,14 +35,43 @@ body{background:var(--fundo);color:var(--texto)}.topo{background:#fff;border-bot
 .painel-premium .suave{color:#ffffffb8}.painel-premium .recurso{border-color:#ffffff24;background:#ffffff0c;color:#fff}.painel-premium .recurso i{color:#f0c879}.painel-premium .recurso p{color:#ffffffb8}
 .rodape{background:var(--verde);color:#ffffffc7}.rodape a{color:#ffffffd1;text-decoration:none}
 .sticky-acoes{position:sticky;top:0;z-index:10;background:#ffffffed;backdrop-filter:blur(10px);border-bottom:1px solid var(--borda)}
-@media(max-width:575.98px){.capa{min-height:155px}.perfil-cabecalho{padding:1.2rem}.secao{padding:1.15rem}.mapa{height:230px}.acoes .btn{flex:1 1 auto}}
+/* Ajustes responsivos específicos do perfil */
+@media(max-width:575.98px){
+  body{overflow-x:hidden}
+  .capa{min-height:145px}
+  .perfil-cabecalho{padding:1.1rem}
+  .perfil-cabecalho h1{font-size:1.55rem;line-height:1.2;overflow-wrap:anywhere}
+  .perfil-meta{align-items:flex-start!important}
+  #atualizacao{width:100%;margin-left:0!important}
+  .acoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+  .acoes .btn{width:100%;min-width:0;padding:.6rem .45rem;font-size:.875rem;white-space:nowrap}
+  .acoes #acaoWhats{grid-column:1/-1}
+  .atalhos{gap:1rem;padding:.85rem 1rem;scrollbar-width:thin;scroll-behavior:smooth}
+  .atalhos a{flex:0 0 auto}
+  .secao{padding:1rem}
+  .secao-titulo{line-height:1.3}
+  .mapa{height:220px}
+  .recurso{padding:.75rem}
+  .recurso h3{font-size:.86rem;line-height:1.25;overflow-wrap:anywhere}
+  .recurso p{font-size:.78rem;line-height:1.4;overflow-wrap:anywhere}
+  .painel-premium{padding:1.1rem!important}
+  .superficie,.painel-premium{min-width:0}
+  .item-dado>div:last-child{min-width:0;overflow-wrap:anywhere}
+}
+@media(max-width:359.98px){
+  .acoes .btn{font-size:.8rem}
+  .perfil-cabecalho{padding:.95rem}
+  .secao{padding:.9rem}
+  .recurso{padding:.65rem}
+  .recurso h3{font-size:.82rem}
+}
 </style>
 </head>
 <body>
 <header class="topo">
 <section><div class="container"><div class="col-12"><div class="row align-items-center py-3 g-3">
-<div class="col-12 col-lg-3"><a class="marca" href="./">guia<span>.</span>comercial</a></div>
-<div class="col-12 col-lg-9"><nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
+<div class="col-6 col-lg-3"><a class="marca" href="./">guia<span>.</span>comercial</a></div>
+<div class="col-6 col-lg-9"><nav class="navbar navbar-expand-lg p-0 justify-content-end" aria-label="Navegação principal">
 <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu"><span class="navbar-toggler-icon"></span></button>
 <div class="collapse navbar-collapse justify-content-lg-end" id="menu"><ul class="navbar-nav align-items-lg-center gap-lg-2">
 <li class="nav-item"><a class="nav-link" href="./">Início</a></li><li class="nav-item"><a class="nav-link" href="comercial.html">Empresas</a></li><li class="nav-item"><a class="nav-link" href="comercial.html">Categorias</a></li><li class="nav-item"><a class="nav-link" href="#">Editorial</a></li><li class="nav-item ms-lg-2"><a class="btn btn-sm btn-guia px-3" href="#areaProprietario">Sou comerciante</a></li>
@@ -58,7 +87,7 @@ body{background:var(--fundo);color:var(--texto)}.topo{background:#fff;border-bot
 <article class="superficie overflow-hidden">
 <div class="capa"><div class="logo-empresa" id="marcaEmpresa"><i class="bi bi-shop"></i></div><span class="badge rounded-pill selo-premium position-absolute top-0 end-0 m-3"><i class="bi bi-stars me-1"></i>Perfil completo</span></div>
 <div class="perfil-cabecalho">
-<div class="d-flex flex-wrap align-items-center gap-2 mb-2"><span class="badge text-bg-light border" id="categoria"></span><span class="badge text-bg-warning" id="status">Cadastro em análise</span><span class="small suave ms-sm-auto" id="atualizacao"></span></div>
+<div class="d-flex flex-wrap align-items-center gap-2 mb-2 perfil-meta"><span class="badge text-bg-light border" id="categoria"></span><span class="badge text-bg-warning" id="status">Cadastro em análise</span><span class="small suave ms-sm-auto" id="atualizacao"></span></div>
 <h1 class="h2 titulo mb-2" id="nome"></h1><p class="suave mb-3" id="descricao"></p>
 <div class="acoes">
 <a class="btn btn-guia" id="acaoWhats" href="#" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
