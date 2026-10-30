@@ -8,7 +8,7 @@ on:
       - main
     paths:
       - "modulo/**"
-      - "data/nucleo-bandeirante/estabelecimentos.json"
+      - "data/nucleo-bandeirante/estabelecimentos.json"\n      - "carousel/**"
       - ".github/workflows/modulo-pages.yml"
 
 permissions:
