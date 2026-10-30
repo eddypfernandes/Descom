@@ -140,6 +140,7 @@
 
       preencherCategorias();
       renderizar();
+      carregarCarousel();
     } catch (erro) {
       contador.textContent = "Dados indisponíveis";
       lista.innerHTML = '<div class="col-12"><div class="alert alert-warning mb-0">Não foi possível carregar os dados do DESCOM. Verifique a publicação do arquivo JSON.</div></div>';
