@@ -79,13 +79,17 @@
   }
 
 
+  let instanciaCarousel;
+
   function quantidadePorSlide() {
-    if (window.innerWidth >= 992) return 3;
-    if (window.innerWidth >= 576) return 2;
-    return 1;
+    return window.innerWidth >= 992 ? 3 : 1;
   }
 
   function renderizarCarousel(registros) {
+    if (instanciaCarousel) {
+      instanciaCarousel.dispose();
+      instanciaCarousel = null;
+    }
     if (!carouselConteudo || !contadorCarousel) return;
 
     const cards = (Array.isArray(registros) ? registros : []).slice(0, 10);
@@ -146,10 +150,22 @@
       : "";
 
     carouselConteudo.innerHTML =
-      '<div id="carouselEmpresas" class="carousel slide" data-bs-interval="false">' +
+      '<div id="carouselEmpresas" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="false">' +
         '<div class="carousel-inner">' + slides + '</div>' +
         controles +
       '</div>';
+
+    const elementoCarousel = document.getElementById("carouselEmpresas");
+    if (elementoCarousel && grupos.length > 1) {
+      instanciaCarousel = new bootstrap.Carousel(elementoCarousel, {
+        interval: 5000,
+        pause: false,
+        ride: "carousel",
+        touch: true,
+        wrap: true
+      });
+      instanciaCarousel.cycle();
+    }
   }
 
   let temporizadorRedimensionamento;
