@@ -60,10 +60,12 @@
 
         return '<div class="col-12 col-lg-4">' +
           '<article class="descom-card h-100">' +
-            imagem +
-            '<div class="descom-card-topo">' +
-              '<span class="descom-card-numero">' + numero + '</span>' +
-              '<span class="descom-card-status">Em análise</span>' +
+            '<div class="descom-card-visual">' +
+              imagem +
+              '<div class="descom-card-overlay">' +
+                '<span class="descom-card-numero">' + numero + '</span>' +
+                '<span class="descom-card-status">Em análise</span>' +
+              '</div>' +
             '</div>' +
             '<div class="descom-card-corpo">' +
               '<p class="descom-card-categoria">' + textoSeguro(item.category || "Categoria não identificada") + '</p>' +
