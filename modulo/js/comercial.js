@@ -65,7 +65,7 @@
         ? '<img class="img-fluid rounded cartao-imagem w-100" src="' + textoSeguro(imagem) + '" alt="">'
         : '<div class="cartao-imagem">Imagem não disponível</div>';
 
-      return '<div class="col-12 col-sm-6 col-lg-4">' +
+      return '<div class="col-12 col-lg-4">' +
         '<article class="cartao-estabelecimento p-3">' +
           visual +
           '<div class="pt-3">' +
