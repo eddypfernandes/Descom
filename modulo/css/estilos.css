@@ -1,0 +1,112 @@
+:root {
+  --guia-verde: #173f35;
+  --guia-verde-hover: #245648;
+  --guia-dourado: #e9a83b;
+  --guia-fundo: #f7f8f5;
+  --guia-texto: #28352f;
+  --guia-suave: #68736c;
+  --guia-borda: #e4e9e3;
+}
+
+body {
+  background: var(--guia-fundo);
+  color: var(--guia-texto);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  color: var(--guia-verde);
+  font-size: 1.05rem;
+  letter-spacing: .06em;
+}
+
+.marca-simbolo {
+  display: inline-grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border-radius: .65rem;
+  background: var(--guia-verde);
+  color: #fff;
+  font-weight: 700;
+}
+
+.sobretitulo {
+  color: var(--guia-verde-hover);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.texto-suave {
+  color: var(--guia-suave);
+}
+
+.contador {
+  display: inline-block;
+  padding: .55rem .85rem;
+  border: 1px solid var(--guia-borda);
+  border-radius: 2rem;
+  background: #fff;
+  color: var(--guia-suave);
+  font-size: .875rem;
+}
+
+.campo-busca,
+.form-select {
+  border-color: var(--guia-borda);
+}
+
+.campo-busca:focus,
+.form-select:focus {
+  border-color: var(--guia-verde-hover);
+  box-shadow: 0 0 0 .2rem rgb(36 86 72 / 12%);
+}
+
+.cartao-estabelecimento {
+  height: 100%;
+  border: 1px solid var(--guia-borda);
+  border-radius: .85rem;
+  background: #fff;
+  transition: border-color .2s ease, transform .2s ease;
+}
+
+.cartao-estabelecimento:hover {
+  transform: translateY(-2px);
+  border-color: #cbd8ce;
+}
+
+.cartao-imagem {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  border-radius: .65rem;
+  background: #eef2ed;
+  color: #8a978e;
+  font-size: .8rem;
+}
+
+.cartao-categoria {
+  color: var(--guia-verde-hover);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.aviso-demo {
+  background: #fff;
+  color: var(--guia-suave);
+}
+
+@media (max-width: 575.98px) {
+  main section {
+    padding-top: 2rem !important;
+  }
+
+  .cartao-imagem {
+    min-height: 125px;
+  }
+}
