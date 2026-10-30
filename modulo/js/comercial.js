@@ -88,12 +88,12 @@
   function renderizarCarousel(registros) {
     if (!carouselConteudo || !contadorCarousel) return;
 
-    const cards = Array.isArray(registros) ? registros : [];
+    const cards = (Array.isArray(registros) ? registros : []).slice(0, 10);
     const porSlide = quantidadePorSlide();
-    contadorCarousel.textContent = cards.length + (cards.length === 1 ? " registro" : " registros");
+    contadorCarousel.textContent = cards.length + " de 10 registros";
 
     if (cards.length === 0) {
-      carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">Aguardando os primeiros registros da pesquisa.</div>';
+      carouselConteudo.innerHTML = '<div class="alert alert-light mb-0">Aguardando os primeiros registros da pesquisa.</div>';
       return;
     }
 
@@ -109,9 +109,14 @@
           ? item.address.neighborhood + " · DF"
           : "Região em identificação";
         const numero = String(indice * porSlide + posicao + 1).padStart(2, "0");
+        const imagemUrl = item.image && item.image.url;
+        const imagem = imagemUrl
+          ? '<img class="descom-card-imagem" src="' + textoSeguro(imagemUrl) + '" alt="' + textoSeguro(item.name || "Imagem do estabelecimento") + '" loading="lazy">'
+          : '<div class="descom-card-imagem descom-card-imagem-vazia" aria-hidden="true"></div>';
 
         return '<div class="col-12 col-sm-6 col-lg-4">' +
           '<article class="descom-card h-100">' +
+            imagem +
             '<div class="descom-card-topo">' +
               '<span class="descom-card-numero">' + numero + '</span>' +
               '<span class="descom-card-status">Em análise</span>' +
@@ -123,7 +128,6 @@
             '</div>' +
             '<div class="descom-card-rodape">' +
               '<span>' + textoSeguro(regiao) + '</span>' +
-              '<span class="descom-card-indicador" aria-hidden="true">↗</span>' +
             '</div>' +
           '</article>' +
         '</div>';
