@@ -10,7 +10,7 @@ on:
         options:
           - validate
           - search
-        default: validate
+        default: search
 
 permissions:
   contents: write
