@@ -1,4 +1,5 @@
 name: Publicar módulo comercial
+# Publicação do ambiente provisório em modulo/
 
 on:
   workflow_dispatch:
