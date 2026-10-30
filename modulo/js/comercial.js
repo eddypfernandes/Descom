@@ -30,11 +30,11 @@
       instanciaCarousel.dispose();
       instanciaCarousel = null;
     }
-    if (!carouselConteudo || !contadorCarousel) return;
+    if (!carouselConteudo) return;
 
     const cards = (Array.isArray(registros) ? registros : []).slice(0, 10);
     const porSlide = quantidadePorSlide();
-    contadorCarousel.textContent = cards.length + " de 10 registros";
+    if (contadorCarousel) contadorCarousel.textContent = cards.length + " de 10 registros";
 
     if (cards.length === 0) {
       carouselConteudo.innerHTML = '<div class="alert alert-light mb-0">Aguardando os primeiros registros da pesquisa.</div>';
