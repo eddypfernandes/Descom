@@ -58,7 +58,7 @@
           ? '<img class="descom-card-imagem" src="' + textoSeguro(imagemUrl) + '" alt="' + textoSeguro(item.name || "Imagem do estabelecimento") + '" loading="lazy">'
           : '<div class="descom-card-imagem descom-card-imagem-vazia" aria-hidden="true"></div>';
 
-        return '<div class="col-12 col-sm-6 col-lg-4">' +
+        return '<div class="col-12 col-lg-4">' +
           '<article class="descom-card h-100">' +
             imagem +
             '<div class="descom-card-topo">' +
