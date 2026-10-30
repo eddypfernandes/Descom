@@ -33,10 +33,16 @@ jobs:
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Preparar arquivos do módulo
+      - name: Preparar arquivos do site
+        run: |
+          mkdir -p site/data/nucleo-bandeirante
+          cp -R modulo/. site/
+          cp data/nucleo-bandeirante/estabelecimentos.json site/data/nucleo-bandeirante/estabelecimentos.json
+
+      - name: Enviar arquivos para publicação
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./modulo"
+          path: "./site"
 
       - name: Publicar página
         id: deployment
