@@ -112,6 +112,14 @@ body {
 }
 
 /* Carousel DESCOM — cards sem moldura externa */ 
+.carousel,
+.carousel-inner,
+.carousel-item {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .descom-carousel-controles {
   display: flex;
   justify-content: flex-end;
@@ -141,7 +149,7 @@ body {
 
 .descom-card {
   display: flex;
-  width: 100%;
+  width: auto;
   min-width: 0;
   max-width: 100%;
   min-height: 275px;
