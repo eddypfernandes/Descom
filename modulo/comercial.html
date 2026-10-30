@@ -102,8 +102,8 @@ function endereco(item){const a=item.address||{},p=[a.neighborhood,a.city,a.stat
 function link(item){const c=item.contacts||{};return urlValida(c.public_profile)||urlValida(c.website)}
 function montarCard(item){
 const status=normalizar(item.validation&&item.validation.status)==='verified'?'Informações verificadas':'Cadastro em análise';
-const destino=link(item);
-const acao=destino?'<a class="link-guia" href="'+escapar(destino)+'" target="_blank" rel="noopener noreferrer">Ver estabelecimento <i class="bi bi-arrow-up-right"></i></a>':'<span class="small suave">Contato ainda não informado</span>';
+const destino='empresa.html?id='+encodeURIComponent(item.id||'');
+const acao='<a class="link-guia" href="'+destino+'">Ver perfil <i class="bi bi-arrow-right"></i></a>';
 const icone='bi '+(icones[normalizar(item.categoria)]||'bi-shop');
 return '<div class="col-12 col-md-6 col-lg-4 item"><article class="card-guia"><div class="card-visual"><span class="card-icone"><i class="'+icone+'"></i></span><span class="selo">'+status+'</span></div><div class="card-body"><div class="categoria">'+escapar(item.categoria)+'</div><h3>'+escapar(item.name)+'</h3><p>'+escapar(item.description||'Informações públicas localizadas. Cadastro em análise.')+'</p>'+acao+'</div><div class="card-local"><i class="bi bi-geo-alt me-1"></i>'+escapar(endereco(item))+'</div></article></div>';
 }
