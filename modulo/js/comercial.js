@@ -7,7 +7,9 @@
   const filtro = document.getElementById("filtro-categoria");
   const contador = document.getElementById("contador-estabelecimentos");
   const aviso = document.getElementById("aviso-demonstracao");
-  const estadoVazio = document.getElementById("estado-vazio");\n  const carouselConteudo = document.getElementById("carousel-empresas-conteudo");\n  const contadorCarousel = document.getElementById("contador-carousel");
+  const estadoVazio = document.getElementById("estado-vazio");
+  const carouselConteudo = document.getElementById("carousel-empresas-conteudo");
+  const contadorCarousel = document.getElementById("contador-carousel");
 
   let estabelecimentos = [];
 
@@ -123,7 +125,8 @@
       if (contadorCarousel) contadorCarousel.textContent = "Aguardando coleta";
     }
   }
-\n  async function iniciar() {
+
+  async function iniciar() {
     try {
       const resposta = await fetch(arquivoDados, { cache: "no-store" });
       if (!resposta.ok) throw new Error("Não foi possível carregar a base JSON.");
