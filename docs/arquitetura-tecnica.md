@@ -71,16 +71,18 @@ Durante o desenvolvimento, o workflow será acionado manualmente. Não haverá a
 
 ## 7. Pesquisa web e provedor
 
-A descoberta inicial utiliza a Brave Search API por HTTPS, diretamente pela biblioteca padrão do Python (urllib). As consultas são segmentadas pelos nove grupos de atividade definidos em docs/estrategia-pesquisa.md e direcionadas ao Brasil, em português, com recorte textual do Núcleo Bandeirante/DF.
+A descoberta inicial utiliza a Tavily Search API por HTTPS, diretamente pela biblioteca padrão do Python (urllib). As consultas são segmentadas pelos nove grupos de atividade definidos em docs/estrategia-pesquisa.md e direcionadas ao Brasil, em português, com recorte textual do Núcleo Bandeirante/DF.
 
-A credencial deve existir exclusivamente como GitHub Actions Secret com o nome BRAVE_API_KEY. Nunca inserir a chave no código, nos arquivos JSON, nos logs ou no repositório.
+O plano gratuito Researcher oferece 1.000 créditos mensais e não exige cartão de crédito. A busca básica consome um crédito por consulta. O DESCOM executa no máximo nove consultas por ciclo inicial (uma por grupo), sem repetição automática. Ao atingir a cota gratuita, a rotina deve parar por limite do provedor; não habilitar plano pago, faturamento ou upgrade.
+
+A credencial deve existir exclusivamente como GitHub Actions Secret com o nome TAVILY_API_KEY. Nunca inserir a chave no código, nos arquivos JSON, nos logs ou no repositório.
 
 A pesquisa gera discovery-results.json como artefato temporário para revisão (retenção de sete dias). Os resultados contêm título, URL e descrição fornecida pelo mecanismo de busca. São candidatos de pesquisa, não cadastros verificados: não entram automaticamente em estabelecimentos.json e não alteram a base oficial.
 
-A execução manual do workflow oferece duas ações: validate e search. A ação search exige o Secret BRAVE_API_KEY. A ação validate não depende dele.
+A execução manual do workflow oferece duas ações: validate e search. A ação search exige o Secret TAVILY_API_KEY. A ação validate não depende dele.
 
-A Brave informa preço de US$ 5 por mil consultas e crédito mensal de US$ 5 no plano Search. A ativação do serviço exige cadastro e cartão. Consultar os termos vigentes do provedor antes de ampliar volume ou reutilizar conteúdo em publicação.
-
+Manter a conta no plano gratuito, sem adicionar cartão nem habilitar upgrade. Antes de cada ciclo, conferir a cota disponível no painel do provedor.
+ 
 ## 8. Dependências
 
 A implementação prioriza a biblioteca padrão do Python. A integração atual não exige pacote externo.
