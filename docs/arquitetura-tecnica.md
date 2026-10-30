@@ -69,10 +69,22 @@ Durante o desenvolvimento, o workflow será acionado manualmente. Não haverá a
 - deduplicação e atualização tenham sido testadas;
 - a saída JSON esteja estável.
 
-## 7. Dependências
+## 7. Pesquisa web e provedor
 
-A implementação inicial deve priorizar a biblioteca padrão do Python. Dependências externas só serão adicionadas quando uma fonte ou funcionalidade concreta exigir.
+A descoberta inicial utiliza a Brave Search API por HTTPS, diretamente pela biblioteca padrão do Python (urllib). As consultas são segmentadas pelos nove grupos de atividade definidos em docs/estrategia-pesquisa.md e direcionadas ao Brasil, em português, com recorte textual do Núcleo Bandeirante/DF.
 
-## 8. Fora do escopo inicial
+A credencial deve existir exclusivamente como GitHub Actions Secret com o nome BRAVE_API_KEY. Nunca inserir a chave no código, nos arquivos JSON, nos logs ou no repositório.
+
+A pesquisa gera discovery-results.json como artefato temporário para revisão (retenção de sete dias). Os resultados contêm título, URL e descrição fornecida pelo mecanismo de busca. São candidatos de pesquisa, não cadastros verificados: não entram automaticamente em estabelecimentos.json e não alteram a base oficial.
+
+A execução manual do workflow oferece duas ações: validate e search. A ação search exige o Secret BRAVE_API_KEY. A ação validate não depende dele.
+
+A Brave informa preço de US$ 5 por mil consultas e crédito mensal de US$ 5 no plano Search. A ativação do serviço exige cadastro e cartão. Consultar os termos vigentes do provedor antes de ampliar volume ou reutilizar conteúdo em publicação.
+
+## 8. Dependências
+
+A implementação prioriza a biblioteca padrão do Python. A integração atual não exige pacote externo.
+
+## 9. Fora do escopo inicial
 
 Não implementar nesta fase painel administrativo, banco de dados, API pública, integração com MS Access, publicação no IIS, assinatura comercial ou expansão simultânea para várias regiões.
