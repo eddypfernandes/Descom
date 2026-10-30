@@ -7,7 +7,7 @@
   const filtro = document.getElementById("filtro-categoria");
   const contador = document.getElementById("contador-estabelecimentos");
   const aviso = document.getElementById("aviso-demonstracao");
-  const estadoVazio = document.getElementById("estado-vazio");
+  const estadoVazio = document.getElementById("estado-vazio");\n  const carouselConteudo = document.getElementById("carousel-empresas-conteudo");\n  const contadorCarousel = document.getElementById("contador-carousel");
 
   let estabelecimentos = [];
 
@@ -76,7 +76,54 @@
     }).join("");
   }
 
-  async function iniciar() {
+
+  function renderizarCarousel(cards) {
+    if (!carouselConteudo || !contadorCarousel) return;
+    const validos = Array.isArray(cards) ? cards : [];
+    contadorCarousel.textContent = validos.length + (validos.length === 1 ? " empresa" : " empresas");
+
+    if (validos.length < 10) {
+      carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">O DESCOM ainda está reunindo empresas verificáveis para completar os 10 cards. Nenhuma empresa foi inventada.</div>';
+      return;
+    }
+
+    const grupos = [];
+    for (let i = 0; i < validos.length; i += 3) grupos.push(validos.slice(i, i + 3));
+    const slides = grupos.map((grupo, indice) => {
+      const cardsHtml = grupo.map(item => {
+        const endereco = enderecoTexto(item.address);
+        return '<div class="col-12 col-md-4"><article class="cartao-estabelecimento h-100 p-3">' +
+          '<p class="cartao-categoria mb-2">' + textoSeguro(item.category || "Comércio e serviços") + '</p>' +
+          '<h3 class="h5 mb-2">' + textoSeguro(item.name || "Empresa") + '</h3>' +
+          '<p class="small texto-suave mb-2">' + textoSeguro(endereco) + '</p>' +
+          '<p class="small texto-suave mb-0">' + textoSeguro(item.description || "Informações públicas em processo de organização.") + '</p>' +
+          '</article></div>';
+      }).join("");
+      return '<div class="carousel-item' + (indice === 0 ? ' active' : '') + '"><div class="row g-3">' + cardsHtml + '</div></div>';
+    }).join("");
+
+    carouselConteudo.innerHTML =
+      '<div id="carouselEmpresas" class="carousel slide" data-bs-ride="false">' +
+        '<div class="carousel-inner">' + slides + '</div>' +
+        '<div class="d-flex justify-content-end gap-2 mt-3">' +
+          '<button class="btn btn-outline-secondary rounded-circle" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="prev" aria-label="Empresas anteriores"><span aria-hidden="true">&lsaquo;</span></button>' +
+          '<button class="btn btn-outline-secondary rounded-circle" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="next" aria-label="Próximas empresas"><span aria-hidden="true">&rsaquo;</span></button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  async function carregarCarousel() {
+    try {
+      const resposta = await fetch("carousel/empresas-carousel.json", { cache: "no-store" });
+      if (!resposta.ok) throw new Error("Arquivo do carousel indisponível.");
+      const dados = await resposta.json();
+      renderizarCarousel(dados.cards);
+    } catch (erro) {
+      if (carouselConteudo) carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">O carousel será exibido assim que a primeira coleta do DESCOM for publicada.</div>';
+      if (contadorCarousel) contadorCarousel.textContent = "Aguardando coleta";
+    }
+  }
+\n  async function iniciar() {
     try {
       const resposta = await fetch(arquivoDados, { cache: "no-store" });
       if (!resposta.ok) throw new Error("Não foi possível carregar a base JSON.");
