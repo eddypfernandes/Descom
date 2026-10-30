@@ -1,13 +1,22 @@
-name: DESCOM - Validar base
+name: DESCOM - Pesquisa e validação
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Rotina a executar"
+        required: true
+        type: choice
+        options:
+          - validate
+          - search
+        default: validate
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  descom:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar repositório
@@ -19,4 +28,20 @@ jobs:
           python-version: "3.12"
 
       - name: Validar base JSON
+        if: inputs.action == 'validate'
         run: python scripts/main.py --validate
+
+      - name: Pesquisar candidatos na web
+        if: inputs.action == 'search'
+        env:
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+        run: python scripts/main.py --search
+
+      - name: Disponibilizar resultados para revisão
+        if: always() && inputs.action == 'search' && hashFiles('discovery-results.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: descom-candidatos-web
+          path: discovery-results.json
+          if-no-files-found: error
+          retention-days: 7
