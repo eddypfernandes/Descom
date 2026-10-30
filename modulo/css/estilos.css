@@ -141,6 +141,9 @@ body {
 
 .descom-card {
   display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 275px;
   flex-direction: column;
   overflow: visible;
@@ -152,6 +155,7 @@ body {
 .descom-card-imagem {
   display: block;
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   background: #edf0ec;
