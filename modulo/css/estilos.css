@@ -110,3 +110,133 @@ body {
     min-height: 125px;
   }
 }
+
+/* Carousel DESCOM — apresentação editorial dos registros encontrados */
+.descom-carousel-controles {
+  display: flex;
+  justify-content: flex-end;
+  gap: .65rem;
+  margin-top: 1.25rem;
+}
+
+.descom-carousel-seta {
+  display: inline-grid;
+  width: 2.65rem;
+  height: 2.65rem;
+  place-items: center;
+  border: 1px solid #cfd8d1;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--guia-verde);
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.descom-carousel-seta:hover {
+  border-color: var(--guia-verde);
+  background: var(--guia-verde);
+  color: #fff;
+}
+
+.descom-card {
+  display: flex;
+  min-height: 285px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--guia-borda);
+  border-radius: .5rem;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.descom-card:hover {
+  border-color: #c6d2c9;
+  box-shadow: 0 .5rem 1.5rem rgb(23 63 53 / 7%);
+}
+
+.descom-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.15rem .85rem;
+  border-bottom: 1px solid #edf0ec;
+}
+
+.descom-card-numero {
+  color: #9aa59d;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+
+.descom-card-status {
+  padding: .28rem .55rem;
+  border: 1px solid #e8e4d9;
+  border-radius: 2px;
+  color: #82734f;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.descom-card-corpo {
+  flex: 1;
+  padding: 1.15rem;
+}
+
+.descom-card-categoria {
+  margin: 0 0 .65rem;
+  color: var(--guia-verde-hover);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.descom-card-titulo {
+  display: -webkit-box;
+  min-height: 3.3rem;
+  overflow: hidden;
+  margin: 0 0 .75rem;
+  color: var(--guia-texto);
+  font-size: 1.08rem;
+  font-weight: 650;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.descom-card-descricao {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--guia-suave);
+  font-size: .84rem;
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.descom-card-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1.15rem;
+  border-top: 1px solid #edf0ec;
+  color: #7b877f;
+  font-size: .75rem;
+}
+
+.descom-card-indicador {
+  color: var(--guia-verde-hover);
+  font-size: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .descom-card {
+    min-height: 250px;
+  }
+}
+
