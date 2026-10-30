@@ -34,7 +34,7 @@ jobs:
       - name: Pesquisar candidatos na web
         if: inputs.action == 'search'
         env:
-          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.BRAVE_API_KEY }}
         run: python scripts/main.py --search
 
       - name: Disponibilizar resultados para revisão
