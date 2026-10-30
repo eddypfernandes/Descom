@@ -8,7 +8,8 @@ on:
       - main
     paths:
       - "modulo/**"
-      - "data/nucleo-bandeirante/estabelecimentos.json"\n      - "carousel/**"
+      - "data/nucleo-bandeirante/estabelecimentos.json"
+      - "carousel/**"
       - ".github/workflows/modulo-pages.yml"
 
 permissions:
@@ -35,9 +36,10 @@ jobs:
 
       - name: Preparar arquivos do site
         run: |
-          mkdir -p site/data/nucleo-bandeirante
+          mkdir -p site/data/nucleo-bandeirante site/carousel
           cp -R modulo/. site/
           cp data/nucleo-bandeirante/estabelecimentos.json site/data/nucleo-bandeirante/estabelecimentos.json
+          cp carousel/empresas-carousel.json site/carousel/empresas-carousel.json
 
       - name: Enviar arquivos para publicação
         uses: actions/upload-pages-artifact@v3
