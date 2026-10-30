@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const arquivoDados = "../data/nucleo-bandeirante/estabelecimentos.json";
+  const arquivoDados = "data/nucleo-bandeirante/estabelecimentos.json";
   const lista = document.getElementById("lista-estabelecimentos");
   const busca = document.getElementById("busca-estabelecimentos");
   const filtro = document.getElementById("filtro-categoria");
