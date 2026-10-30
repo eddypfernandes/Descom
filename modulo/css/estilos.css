@@ -111,24 +111,24 @@ body {
   }
 }
 
-/* Carousel DESCOM — apresentação editorial dos registros encontrados */
+/* Carousel DESCOM — cards sem moldura externa */ 
 .descom-carousel-controles {
   display: flex;
   justify-content: flex-end;
-  gap: .65rem;
-  margin-top: 1.25rem;
+  gap: .6rem;
+  margin-top: 1.1rem;
 }
 
 .descom-carousel-seta {
   display: inline-grid;
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
   place-items: center;
   border: 1px solid #cfd8d1;
   border-radius: 50%;
   background: #fff;
   color: var(--guia-verde);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   line-height: 1;
   transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
@@ -141,69 +141,71 @@ body {
 
 .descom-card {
   display: flex;
-  min-height: 285px;
+  min-height: 275px;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--guia-borda);
-  border-radius: .5rem;
-  background: #fff;
-  transition: border-color .2s ease, box-shadow .2s ease;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
-.descom-card:hover {
-  border-color: #c6d2c9;
-  box-shadow: 0 .5rem 1.5rem rgb(23 63 53 / 7%);
+.descom-card-imagem {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #edf0ec;
+}
+
+.descom-card-imagem-vazia {
+  background: #edf0ec;
 }
 
 .descom-card-topo {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.15rem .85rem;
-  border-bottom: 1px solid #edf0ec;
+  padding: .8rem 0 .55rem;
 }
 
 .descom-card-numero {
-  color: #9aa59d;
-  font-size: .75rem;
+  color: #929d95;
+  font-size: .68rem;
   font-weight: 700;
-  letter-spacing: .1em;
+  letter-spacing: .09em;
 }
 
 .descom-card-status {
-  padding: .28rem .55rem;
-  border: 1px solid #e8e4d9;
-  border-radius: 2px;
   color: #82734f;
-  font-size: .65rem;
+  font-size: .62rem;
   font-weight: 600;
-  letter-spacing: .045em;
+  letter-spacing: .04em;
   text-transform: uppercase;
 }
 
 .descom-card-corpo {
   flex: 1;
-  padding: 1.15rem;
+  padding: .35rem 0 .8rem;
 }
 
 .descom-card-categoria {
-  margin: 0 0 .65rem;
+  margin: 0 0 .45rem;
   color: var(--guia-verde-hover);
-  font-size: .68rem;
+  font-size: .62rem;
   font-weight: 700;
-  letter-spacing: .09em;
+  letter-spacing: .085em;
   text-transform: uppercase;
 }
 
 .descom-card-titulo {
   display: -webkit-box;
-  min-height: 3.3rem;
+  min-height: 2.55rem;
   overflow: hidden;
-  margin: 0 0 .75rem;
+  margin: 0 0 .5rem;
   color: var(--guia-texto);
-  font-size: 1.08rem;
+  font-size: .94rem;
   font-weight: 650;
-  line-height: 1.45;
+  line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -213,30 +215,25 @@ body {
   overflow: hidden;
   margin: 0;
   color: var(--guia-suave);
-  font-size: .84rem;
-  line-height: 1.65;
+  font-size: .76rem;
+  line-height: 1.5;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
 
 .descom-card-rodape {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: .85rem 1.15rem;
-  border-top: 1px solid #edf0ec;
+  padding: .65rem 0 0;
+  border-top: 1px solid #e9ede8;
   color: #7b877f;
-  font-size: .75rem;
-}
-
-.descom-card-indicador {
-  color: var(--guia-verde-hover);
-  font-size: 1rem;
+  font-size: .68rem;
 }
 
 @media (max-width: 575.98px) {
   .descom-card {
-    min-height: 250px;
+    min-height: 0;
+  }
+
+  .descom-card-imagem {
+    aspect-ratio: 16 / 8;
   }
 }
-
