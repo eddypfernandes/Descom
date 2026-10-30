@@ -79,52 +79,82 @@
   }
 
 
-  function renderizarCarousel(cards) {
-    if (!carouselConteudo || !contadorCarousel) return;
-    const validos = Array.isArray(cards) ? cards : [];
-    contadorCarousel.textContent = validos.length + (validos.length === 1 ? " empresa" : " empresas");
+  function quantidadePorSlide() {
+    if (window.innerWidth >= 992) return 3;
+    if (window.innerWidth >= 576) return 2;
+    return 1;
+  }
 
-    if (validos.length < 10) {
-      carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">O DESCOM ainda está reunindo empresas verificáveis para completar os 10 cards. Nenhuma empresa foi inventada.</div>';
+  function renderizarCarousel(registros) {
+    if (!carouselConteudo || !contadorCarousel) return;
+
+    const cards = Array.isArray(registros) ? registros : [];
+    const porSlide = quantidadePorSlide();
+    contadorCarousel.textContent = cards.length + (cards.length === 1 ? " registro" : " registros");
+
+    if (cards.length === 0) {
+      carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">Aguardando os primeiros registros da pesquisa.</div>';
       return;
     }
 
     const grupos = [];
-    for (let i = 0; i < validos.length; i += 3) grupos.push(validos.slice(i, i + 3));
+    for (let i = 0; i < cards.length; i += porSlide) {
+      grupos.push(cards.slice(i, i + porSlide));
+    }
+
     const slides = grupos.map((grupo, indice) => {
-      const cardsHtml = grupo.map(item => {
-        const endereco = enderecoTexto(item.address);
-        return '<div class="col-12 col-md-4"><article class="cartao-estabelecimento h-100 p-3">' +
-          '<p class="cartao-categoria mb-2">' + textoSeguro(item.category || "Comércio e serviços") + '</p>' +
-          '<h3 class="h5 mb-2">' + textoSeguro(item.name || "Empresa") + '</h3>' +
-          '<p class="small texto-suave mb-2">' + textoSeguro(endereco) + '</p>' +
-          '<p class="small texto-suave mb-0">' + textoSeguro(item.description || "Informações públicas em processo de organização.") + '</p>' +
-          '</article></div>';
+      const cardsHtml = grupo.map((item, posicao) => {
+        const descricao = item.description || "Descrição ainda não disponível.";
+        const regiao = item.address && item.address.neighborhood
+          ? item.address.neighborhood + " · DF"
+          : "Região em identificação";
+        const numero = String(indice * porSlide + posicao + 1).padStart(2, "0");
+
+        return '<div class="col-12 col-sm-6 col-lg-4">' +
+          '<article class="descom-card h-100">' +
+            '<div class="descom-card-topo">' +
+              '<span class="descom-card-numero">' + numero + '</span>' +
+              '<span class="descom-card-status">Em análise</span>' +
+            '</div>' +
+            '<div class="descom-card-corpo">' +
+              '<p class="descom-card-categoria">' + textoSeguro(item.category || "Categoria não identificada") + '</p>' +
+              '<h3 class="descom-card-titulo">' + textoSeguro(item.name || "Nome não identificado") + '</h3>' +
+              '<p class="descom-card-descricao">' + textoSeguro(descricao) + '</p>' +
+            '</div>' +
+            '<div class="descom-card-rodape">' +
+              '<span>' + textoSeguro(regiao) + '</span>' +
+              '<span class="descom-card-indicador" aria-hidden="true">↗</span>' +
+            '</div>' +
+          '</article>' +
+        '</div>';
       }).join("");
-      return '<div class="carousel-item' + (indice === 0 ? ' active' : '') + '"><div class="row g-3">' + cardsHtml + '</div></div>';
+
+      return '<div class="carousel-item' + (indice === 0 ? ' active' : '') + '">' +
+        '<div class="row g-3">' + cardsHtml + '</div>' +
+      '</div>';
     }).join("");
 
+    const controles = grupos.length > 1
+      ? '<div class="descom-carousel-controles">' +
+          '<button class="descom-carousel-seta" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="prev" aria-label="Registros anteriores">←</button>' +
+          '<button class="descom-carousel-seta" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="next" aria-label="Próximos registros">→</button>' +
+        '</div>'
+      : "";
+
     carouselConteudo.innerHTML =
-      '<div id="carouselEmpresas" class="carousel slide" data-bs-ride="false">' +
+      '<div id="carouselEmpresas" class="carousel slide" data-bs-interval="false">' +
         '<div class="carousel-inner">' + slides + '</div>' +
-        '<div class="d-flex justify-content-end gap-2 mt-3">' +
-          '<button class="btn btn-outline-secondary rounded-circle" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="prev" aria-label="Empresas anteriores"><span aria-hidden="true">&lsaquo;</span></button>' +
-          '<button class="btn btn-outline-secondary rounded-circle" type="button" data-bs-target="#carouselEmpresas" data-bs-slide="next" aria-label="Próximas empresas"><span aria-hidden="true">&rsaquo;</span></button>' +
-        '</div>' +
+        controles +
       '</div>';
   }
 
-  async function carregarCarousel() {
-    try {
-      const resposta = await fetch("carousel/empresas-carousel.json", { cache: "no-store" });
-      if (!resposta.ok) throw new Error("Arquivo do carousel indisponível.");
-      const dados = await resposta.json();
-      renderizarCarousel(dados.cards);
-    } catch (erro) {
-      if (carouselConteudo) carouselConteudo.innerHTML = '<div class="alert alert-light border mb-0">O carousel será exibido assim que a primeira coleta do DESCOM for publicada.</div>';
-      if (contadorCarousel) contadorCarousel.textContent = "Aguardando coleta";
-    }
-  }
+  let temporizadorRedimensionamento;
+  window.addEventListener("resize", function () {
+    window.clearTimeout(temporizadorRedimensionamento);
+    temporizadorRedimensionamento = window.setTimeout(function () {
+      renderizarCarousel(estabelecimentos);
+    }, 180);
+  });
 
   async function iniciar() {
     try {
@@ -140,7 +170,7 @@
 
       preencherCategorias();
       renderizar();
-      carregarCarousel();
+      renderizarCarousel(estabelecimentos);
     } catch (erro) {
       contador.textContent = "Dados indisponíveis";
       lista.innerHTML = '<div class="col-12"><div class="alert alert-warning mb-0">Não foi possível carregar os dados do DESCOM. Verifique a publicação do arquivo JSON.</div></div>';
