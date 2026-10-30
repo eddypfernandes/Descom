@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estabelecimento | Guia Comercial</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root{--verde:#173f35;--hover:#245648;--ouro:#e9a83b;--fundo:#f7f8f5;--texto:#28352f;--suave:#68736c;--borda:#e4e9e3}
+body{background:var(--fundo);color:var(--texto)}.topo{background:#fff;border-bottom:1px solid var(--borda)}
+.marca{font-size:1.35rem;font-weight:750;letter-spacing:-.04em;color:var(--verde);text-decoration:none}.marca span{color:var(--ouro)}
+.nav-link{color:#48564e;font-size:.94rem}.nav-link:hover{color:var(--verde)}
+.btn-guia{background:var(--verde);border-color:var(--verde);color:#fff}.btn-guia:hover{background:var(--hover);border-color:var(--hover);color:#fff}
+.breadcrumb{font-size:.84rem;margin:0}.breadcrumb a{color:var(--suave);text-decoration:none}
+.titulo{font-weight:700;letter-spacing:-.025em}.suave{color:var(--suave)}
+.perfil{background:#fff;border:1px solid var(--borda);border-radius:1rem;overflow:hidden}
+.perfil-capa{min-height:190px;background:linear-gradient(125deg,#eaf0eb,#f7f8f5);display:grid;place-items:center;border-bottom:1px solid var(--borda)}
+.perfil-icone{width:76px;height:76px;border-radius:1.25rem;background:#fff;display:grid;place-items:center;color:var(--verde);font-size:2rem;box-shadow:0 5px 20px #173f3512}
+.dado{padding:1rem 0;border-bottom:1px solid var(--borda)}.dado:last-child{border:0}
+.etiqueta{font-size:.75rem;color:var(--suave);text-transform:uppercase;letter-spacing:.05em}
+.rodape{background:var(--verde);color:#ffffffc7}.rodape a{color:#ffffffd1;text-decoration:none}
+</style>
+</head>
+<body>
+<header class="topo">
+<section><div class="container"><div class="col-12"><div class="row align-items-center py-3 g-3">
+<div class="col-12 col-lg-3"><a class="marca" href="./">guia<span>.</span>comercial</a></div>
+<div class="col-12 col-lg-9"><nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
+<button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse justify-content-lg-end" id="menu"><ul class="navbar-nav align-items-lg-center gap-lg-2">
+<li class="nav-item"><a class="nav-link" href="./">Início</a></li><li class="nav-item"><a class="nav-link" href="comercial.html">Empresas</a></li><li class="nav-item"><a class="nav-link" href="comercial.html">Categorias</a></li><li class="nav-item"><a class="nav-link" href="#">Editorial</a></li><li class="nav-item ms-lg-2"><a class="btn btn-sm btn-guia px-3" href="#">Sou comerciante</a></li>
+</ul></div></nav></div>
+</div></div></div></section>
+</header>
+<main>
+<section class="py-3 bg-white border-bottom"><div class="container"><div class="col-12"><div class="row"><div class="col-12"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./">Início</a></li><li class="breadcrumb-item"><a href="comercial.html">Comercial</a></li><li class="breadcrumb-item active" aria-current="page">Estabelecimento</li></ol></nav></div></div></div></div></section>
+<section class="py-4 py-lg-5"><div class="container"><div class="col-12"><div class="row justify-content-center g-4">
+<div class="col-12 col-lg-8">
+<div id="carregando" class="text-center py-5"><div class="spinner-border" style="color:var(--verde)" role="status"><span class="visually-hidden">Carregando...</span></div><p class="small suave mt-3">Carregando informações do estabelecimento.</p></div>
+<div id="conteudo" class="d-none">
+<article class="perfil">
+<div class="perfil-capa"><span class="perfil-icone"><i class="bi bi-shop"></i></span></div>
+<div class="p-4 p-lg-5">
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3"><span class="badge rounded-pill text-bg-light border" id="categoria"></span><span class="badge rounded-pill text-bg-warning" id="status">Cadastro em análise</span></div>
+<h1 class="h2 titulo mb-3" id="nome"></h1>
+<p class="suave mb-4" id="descricao"></p>
+<hr class="my-4">
+<h2 class="h5 titulo mb-3">Informações do estabelecimento</h2>
+<div class="dado"><div class="etiqueta mb-1">Localização</div><div id="endereco">Núcleo Bandeirante · Brasília, DF</div></div>
+<div class="dado d-none" id="linhaTelefone"><div class="etiqueta mb-1">Telefone</div><div id="telefone"></div></div>
+<div class="dado d-none" id="linhaSite"><div class="etiqueta mb-1">Site ou perfil público</div><a id="site" href="#" target="_blank" rel="noopener noreferrer">Acessar fonte pública</a></div>
+<div class="alert alert-light border small mt-4 mb-0"><i class="bi bi-info-circle me-1"></i>Este cadastro foi localizado em fontes públicas e ainda não foi confirmado pelo responsável pelo estabelecimento. As informações podem precisar de atualização.</div>
+</div>
+</article>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4"><a href="comercial.html" class="link-secondary text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar aos estabelecimentos</a><a href="#" id="fonte" class="btn btn-guia d-none" target="_blank" rel="noopener noreferrer">Consultar fonte pública <i class="bi bi-box-arrow-up-right ms-1"></i></a></div>
+</div>
+<div id="naoEncontrado" class="alert alert-light border d-none"><h1 class="h5">Estabelecimento não encontrado</h1><p class="mb-3">Não localizamos esse cadastro na base atual do Guia Comercial.</p><a href="comercial.html" class="btn btn-guia btn-sm">Voltar ao catálogo</a></div>
+<div id="falha" class="alert alert-warning d-none">Não foi possível carregar as informações neste momento. Tente novamente mais tarde.</div>
+</div>
+</div></div></div></section>
+</main>
+<footer class="rodape py-4"><section><div class="container"><div class="col-12"><div class="row gy-3 align-items-center"><div class="col-12 col-md-6"><div class="text-white fw-semibold mb-1">Guia Comercial</div><div class="small">Conectando pessoas, empresas e oportunidades no Núcleo Bandeirante.</div></div><div class="col-12 col-md-6 text-md-end small"><a href="comercial.html">Empresas</a></div></div><hr class="border-light opacity-25 my-3"><div class="small text-center">© 2026 Guia Comercial. Todos os direitos reservados.</div></div></div></section></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+const URL_JSON='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/estabelecimentos.json';
+const id=new URLSearchParams(window.location.search).get('id');
+const el=id=>document.getElementById(id);
+function texto(v){return String(v||'').trim()}
+function urlSegura(v){try{const u=new URL(v);return ['https:','http:'].includes(u.protocol)?u.href:''}catch(e){return ''}}
+function mostrar(id,sim=true){el(id).classList.toggle('d-none',!sim)}
+function endereco(a){a=a||{};return [a.street,a.number,a.complement,a.neighborhood,a.city,a.state,a.postal_code].filter(Boolean).join(', ')||'Núcleo Bandeirante · Brasília, DF'}
+if(!id){mostrar('carregando',false);mostrar('naoEncontrado');return}
+fetch(URL_JSON,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('JSON indisponível');return r.json()}).then(d=>{
+const item=(d.establishments||[]).find(x=>String(x.id)===id);
+mostrar('carregando',false);
+if(!item){mostrar('naoEncontrado');return}
+el('nome').textContent=texto(item.name)||'Estabelecimento';
+el('categoria').textContent=texto(item.category)||'Estabelecimento';
+el('descricao').textContent=texto(item.description)||'Informações públicas localizadas. Cadastro em análise.';
+el('endereco').textContent=endereco(item.address);
+const status=item.validation&&item.validation.status==='verified'?'Informações verificadas':'Cadastro em análise';
+el('status').textContent=status;
+if(status==='Informações verificadas'){el('status').className='badge rounded-pill text-bg-success'}
+const c=item.contacts||{};
+if(texto(c.phone)){el('telefone').textContent=c.phone;mostrar('linhaTelefone')}
+const link=urlSegura(c.public_profile)||urlSegura(c.website);
+if(link){el('site').href=link;el('site').textContent=link;mostrar('linhaSite');el('fonte').href=link;mostrar('fonte')}
+mostrar('conteudo');
+}).catch(()=>{mostrar('carregando',false);mostrar('falha')});
+})();
+</script>
+</body>
+</html>
