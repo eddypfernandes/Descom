@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173f35">
+<title>DESCOM | Revisão geográfica</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+<style>
+:root{--gc-primary:#173f35;--gc-hover:#245648;--gc-gold:#e9a83b;--gc-bg:#f7f8f5;--gc-text:#28352f;--gc-muted:#68736c;--gc-border:#e4e9e3}
+body{background:var(--gc-bg);color:var(--gc-text)}
+header{background:var(--gc-primary);color:#fff}
+#map{height:42vh;min-height:290px;border-radius:.75rem;border:1px solid var(--gc-border);z-index:1}
+.card-review{border:1px solid var(--gc-border);border-radius:.75rem}
+.card-review.active{border:2px solid var(--gc-primary)}
+.small-muted{color:var(--gc-muted);font-size:.875rem}
+.badge-soft{background:#e8eee9;color:var(--gc-primary)}
+.btn-gc{background:var(--gc-primary);color:#fff}
+.btn-gc:hover{background:var(--gc-hover);color:#fff}
+.sticky-tools{position:sticky;top:0;z-index:1000;background:var(--gc-bg);padding:.65rem 0;border-bottom:1px solid var(--gc-border)}
+.leaflet-popup-content{min-width:180px}
+.form-select,.form-control{border-color:#d7dfd8}
+.review-actions .btn{font-size:.8rem}
+@media(min-width:992px){#map{height:calc(100vh - 245px);min-height:500px;position:sticky;top:110px}}
+</style>
+</head>
+<body>
+<header class="py-3 mb-3">
+ <div class="container">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+   <div><div class="small text-white-50">DESCOM · NÚCLEO BANDEIRANTE</div><h1 class="h4 mb-0">Revisão geográfica</h1></div>
+   <span class="badge text-bg-light">139 registros para conferir</span>
+  </div>
+  <p class="small text-white-50 mb-0 mt-2">Confira cada ponto no mapa e registre sua decisão. Nenhum dado original será alterado.</p>
+ </div>
+</header>
+<main class="container pb-5">
+ <div id="loading" class="alert alert-info">Carregando descobertas e triagem do DESCOM…</div>
+ <div id="error" class="alert alert-danger d-none"></div>
+ <section id="app" class="d-none">
+  <div class="row g-2 mb-3" id="summary"></div>
+  <div class="sticky-tools">
+   <div class="row g-2">
+    <div class="col-12 col-md-4"><input id="search" class="form-control" placeholder="Buscar estabelecimento…" aria-label="Buscar estabelecimento"></div>
+    <div class="col-6 col-md-3"><select id="category" class="form-select"><option value="">Todas as categorias</option></select></div>
+    <div class="col-6 col-md-3"><select id="decision" class="form-select"><option value="">Todas as triagens</option><option value="revisao_manual">Revisão manual</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter até confirmação</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option></select></div>
+    <div class="col-8 col-md-1"><select id="status" class="form-select" aria-label="Situação da revisão"><option value="">Todos</option><option value="pendente">Pendentes</option><option value="confirmado">Confirmados</option><option value="corrigir">Corrigir</option><option value="duplicado">Duplicados</option><option value="descartar">Descartar</option></select></div>
+    <div class="col-4 col-md-1 d-grid"><button id="clear" class="btn btn-outline-secondary" title="Limpar filtros">Limpar</button></div>
+   </div>
+  </div>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 my-3">
+   <div class="small-muted" id="result-count"></div>
+   <div class="d-flex gap-2">
+    <button id="export" class="btn btn-sm btn-gc">Exportar revisão</button>
+    <button id="reset" class="btn btn-sm btn-outline-danger">Apagar marcações</button>
+   </div>
+  </div>
+  <div class="row g-3">
+   <div class="col-12 col-lg-7"><div id="map" aria-label="Mapa dos estabelecimentos"></div><p class="small-muted mt-2 mb-0">Mapa © OpenStreetMap contributors · Os pontos de áreas podem representar centros aproximados.</p></div>
+   <div class="col-12 col-lg-5"><div id="list" class="d-grid gap-2"></div></div>
+  </div>
+ </section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(() => {
+ const DATA_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/descobertas.json';
+ const TRIAGE_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/triagem.json';
+ const STORE_KEY='descom_revisao_nb_v1';
+ let businesses=[], triageById={}, map, markers=[], activeId=null, reviews={};
+ const $=id=>document.getElementById(id);
+ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const labelDecision={revisao_manual:'Revisão manual',revisao_de_escopo:'Revisão de escopo',reter_ate_confirmacao:'Reter até confirmação',fora_da_vitrine_comercial:'Fora da vitrine'};
+ const labelStatus={pendente:'Pendente',confirmado:'Confirmado',corrigir:'Corrigir dados',duplicado:'Possível duplicado',descartar:'Descartar'};
+ const addr=b=>[b.address?.street,b.address?.number,b.address?.neighborhood].filter(Boolean).join(', ')||'Endereço não informado';
+ const coords=b=>Number.isFinite(Number(b.location?.latitude))&&Number.isFinite(Number(b.location?.longitude));
+ function readReviews(){try{reviews=JSON.parse(localStorage.getItem(STORE_KEY)||'{}')}catch(e){reviews={}}}
+ function saveReviews(){localStorage.setItem(STORE_KEY,JSON.stringify(reviews));renderSummary();renderList()}
+ function reviewOf(id){return reviews[id]||{status:'pendente',note:''}}
+ function mapsUrl(b){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((b.name||'estabelecimento')+' '+(addr(b))+' Núcleo Bandeirante Brasília')+'&query_place_id='}
+ function osmUrl(b){return b.contacts?.public_profile||'https://www.openstreetmap.org/?mlat='+b.location.latitude+'&mlon='+b.location.longitude+'#map=19/'+b.location.latitude+'/'+b.location.longitude}
+ function filtered(){
+  const q=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('category').value,dec=$('decision').value,st=$('status').value;
+  return businesses.filter(b=>{const t=triageById[b.id]||{};const r=reviewOf(b.id);return(!q||[b.name,b.category,addr(b)].join(' ').toLocaleLowerCase('pt-BR').includes(q))&&(!cat||b.category===cat)&&(!dec||t.decision===dec)&&(!st||r.status===st)});
+ }
+ function renderSummary(){
+  const counts=Object.fromEntries(Object.keys(labelStatus).map(k=>[k,0]));businesses.forEach(b=>counts[reviewOf(b.id).status]++);
+  $('summary').innerHTML=Object.entries(labelStatus).map(([k,v])=>'<div class="col-6 col-md"><div class="card card-review p-2 h-100"><div class="small-muted">'+v+'</div><div class="h4 mb-0">'+counts[k]+'</div></div></div>').join('');
+ }
+ function initMap(){
+  map=L.map('map').setView([-15.8715,-47.9695],15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+ }
+ function renderMap(items){
+  markers.forEach(m=>map.removeLayer(m));markers=[];
+  items.filter(coords).forEach(b=>{
+   const m=L.marker([b.location.latitude,b.location.longitude]).addTo(map);
+   m.bindPopup('<strong>'+esc(b.name)+'</strong><br>'+esc(b.category)+'<br><a href="'+esc(mapsUrl(b))+'" target="_blank" rel="noopener">Abrir no Google Maps</a>');
+   m.on('click',()=>{activeId=b.id;renderList();});
+   m._businessId=b.id;markers.push(m);
+  });
+  if(markers.length){const group=L.featureGroup(markers);map.fitBounds(group.getBounds().pad(.12),{maxZoom:16});}
+ }
+ function renderList(){
+  const items=filtered();$('result-count').textContent=items.length+' de '+businesses.length+' registros · '+items.filter(coords).length+' com coordenadas';
+  $('list').innerHTML=items.map(b=>{
+   const t=triageById[b.id]||{},r=reviewOf(b.id),f=t.flags||[];
+   return '<article class="card card-review '+(activeId===b.id?'active':'')+'" id="card-'+esc(b.id)+'"><div class="card-body p-3">'+
+    '<div class="d-flex justify-content-between gap-2"><div><h2 class="h6 mb-1">'+esc(b.name)+'</h2><div class="small-muted">'+esc(b.category)+' · '+esc(labelDecision[t.decision]||'Sem triagem')+'</div></div><span class="badge badge-soft align-self-start">'+esc(labelStatus[r.status])+'</span></div>'+
+    '<div class="small mt-2">'+esc(addr(b))+'</div>'+
+    '<div class="small-muted mt-1">'+(b.contacts?.phone?'Tel. '+esc(b.contacts.phone):'Sem telefone')+' · '+(coords(b)?(b.location.coordinate_method==='node'?'Ponto OSM':'Centro aproximado'):'Sem coordenadas')+'</div>'+
+    (f.length?'<div class="d-flex flex-wrap gap-1 mt-2">'+f.slice(0,4).map(x=>'<span class="badge text-bg-light border">'+esc(x.replaceAll('_',' '))+'</span>').join('')+'</div>':'')+
+    '<div class="d-flex flex-wrap gap-2 mt-3"><a class="btn btn-sm btn-outline-primary" href="'+esc(mapsUrl(b))+'" target="_blank" rel="noopener">Google Maps</a><a class="btn btn-sm btn-outline-secondary" href="'+esc(osmUrl(b))+'" target="_blank" rel="noopener">Ver no OSM</a>'+(coords(b)?'<button class="btn btn-sm btn-outline-secondary locate" data-id="'+esc(b.id)+'">Ver ponto</button>':'')+'</div>'+
+    '<div class="review-actions d-flex flex-wrap gap-1 mt-3">'+[['confirmado','Confirmar'],['corrigir','Corrigir'],['duplicado','Duplicado'],['descartar','Descartar']].map(([v,l])=>'<button class="btn '+(r.status===v?'btn-gc':'btn-outline-success')+' mark" data-id="'+esc(b.id)+'" data-status="'+v+'">'+l+'</button>').join('')+'</div>'+
+    '<textarea class="form-control form-control-sm mt-2 note" rows="2" data-id="'+esc(b.id)+'" placeholder="Observação da conferência…">'+esc(r.note)+'</textarea>'+
+    '<div class="small-muted mt-2">ID: '+esc(b.external_id||b.id)+'</div></div></article>';
+  }).join('')||'<div class="alert alert-light border">Nenhum registro encontrado com esses filtros.</div>';
+  $('list').querySelectorAll('.mark').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.id;reviews[id]={...reviewOf(id),status:btn.dataset.status,updated_at:new Date().toISOString()};saveReviews()}));
+  $('list').querySelectorAll('.note').forEach(el=>el.addEventListener('change',()=>{const id=el.dataset.id;reviews[id]={...reviewOf(id),note:el.value,updated_at:new Date().toISOString()};localStorage.setItem(STORE_KEY,JSON.stringify(reviews))}));
+  $('list').querySelectorAll('.locate').forEach(btn=>btn.addEventListener('click',()=>focusBusiness(btn.dataset.id)));
+ }
+ function focusBusiness(id){
+  const b=businesses.find(x=>x.id===id);if(!b)return;activeId=id;
+  if(coords(b)){map.setView([b.location.latitude,b.location.longitude],18);const m=markers.find(x=>x._businessId===id);if(m)m.openPopup();}
+  renderList();const card=$('card-'+id);if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+ }
+ function exportReviews(){
+  const payload={generated_at:new Date().toISOString(),region:'Núcleo Bandeirante',source_file:'descobertas.json',review_records:Object.entries(reviews).map(([id,r])=>({id,...r})),attribution:'© OpenStreetMap contributors',license:'ODbL'};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='descom-revisao-nucleo-bandeirante.json';a.click();URL.revokeObjectURL(url);
+ }
+ async function start(){
+  try{
+   const [d,t]=await Promise.all([fetch(DATA_URL),fetch(TRIAGE_URL)]);if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos do repositório.');
+   const discovery=await d.json(),triage=await t.json();businesses=discovery.establishments||[];(triage.records||[]).forEach(x=>triageById[x.id]=x);
+   readReviews();
+   const cats=[...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+   cats.forEach(c=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(c)+'">'+esc(c)+'</option>'));
+   $('loading').classList.add('d-none');$('app').classList.remove('d-none');initMap();renderSummary();renderMap(businesses);renderList();
+   ['search','category','decision','status'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{renderMap(filtered());renderList()}));
+   $('clear').addEventListener('click',()=>{['search','category','decision','status'].forEach(id=>$(id).value='');renderMap(businesses);renderList()});
+   $('export').addEventListener('click',exportReviews);
+   $('reset').addEventListener('click',()=>{if(confirm('Apagar todas as marcações e observações salvas neste navegador?')){reviews={};localStorage.removeItem(STORE_KEY);renderSummary();renderList()}});
+   $('result-count').textContent=businesses.length+' registros carregados.';
+  }catch(e){$('loading').classList.add('d-none');$('error').textContent=e.message;$('error').classList.remove('d-none')}
+ }
+ start();
+})();
+</script>
+</body>
+</html>
