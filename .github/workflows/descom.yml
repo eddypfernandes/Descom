@@ -13,12 +13,9 @@ on:
           - triage
         default: triage
       region:
-        description: "Região Administrativa"
+        description: "Chave da Região Administrativa em config/regions.json"
         required: true
-        type: choice
-        options:
-          - nucleo-bandeirante
-          - riacho-fundo-i
+        type: string
         default: nucleo-bandeirante
 
 permissions:
@@ -62,7 +59,7 @@ jobs:
           fi
 
       - name: Disponibilizar arquivo para revisão
-        if: always() && inputs.action == 'triage' && hashFiles('data/nucleo-bandeirante/triagem.json') != ''
+        if: always() && inputs.action == 'triage' && hashFiles(format('data/{0}/triagem.json', inputs.region)) != ''
         uses: actions/upload-artifact@v4
         with:
           name: descom-triagem-${{ inputs.region }}
