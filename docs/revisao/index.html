@@ -42,7 +42,7 @@ header{background:var(--gc-primary);color:#fff}
   <div class="row g-2 mb-3" id="summary"></div>
   <div class="sticky-tools">
    <div class="row g-2">
-    <div class="col-12 col-md-3"><label for="region" class="form-label small-muted mb-1">Região Administrativa</label><select id="region" class="form-select" aria-label="Selecionar Região Administrativa"><option value="nucleo-bandeirante" selected>Núcleo Bandeirante</option></select></div>
+    <div class="col-12 col-md-3"><label for="region" class="form-label small-muted mb-1">Região Administrativa</label><select id="region" class="form-select" aria-label="Selecionar Região Administrativa"><option value="">Carregando regiões…</option></select></div>
     <div class="col-12 col-md-3"><label for="search" class="form-label small-muted mb-1">Estabelecimento</label><input id="search" class="form-control" placeholder="Buscar estabelecimento…" aria-label="Buscar estabelecimento"></div>
     <div class="col-6 col-md-2"><label for="category" class="form-label small-muted mb-1">Categoria</label><select id="category" class="form-select"><option value="">Todas</option></select></div>
     <div class="col-6 col-md-2"><label for="decision" class="form-label small-muted mb-1">Triagem</label><select id="decision" class="form-select"><option value="">Todas</option><option value="revisao_manual">Revisão manual</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter até confirmação</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option></select></div>
@@ -137,7 +137,7 @@ header{background:var(--gc-primary);color:#fff}
     '<div class="review-actions d-flex flex-wrap gap-1 mt-3">'+[['confirmado','Confirmar'],['corrigir','Corrigir'],['duplicado','Duplicado'],['descartar','Descartar']].map(([v,l])=>'<button class="btn '+(r.status===v?'btn-gc':'btn-outline-success')+' mark" data-id="'+esc(b.id)+'" data-status="'+v+'">'+l+'</button>').join('')+'</div>'+
     '<textarea class="form-control form-control-sm mt-2 note" rows="2" data-id="'+esc(b.id)+'" placeholder="Observação da conferência…">'+esc(r.note)+'</textarea>'+
     '<div class="small-muted mt-2">ID: '+esc(b.external_id||b.id)+'</div></div></article>';
-  }).join('')||'<div class="alert alert-light border">Nenhum registro encontrado com esses filtros.</div>';
+  }).join('')||(businesses.length===0&&!REGIONS[currentRegion].ready?'<div class="alert alert-info border">A primeira coleta do DESCOM para esta região ainda está pendente. Os estabelecimentos aparecerão aqui após a execução da descoberta e da triagem.</div>':'<div class="alert alert-light border">Nenhum registro encontrado com esses filtros.</div>');
   $('list').querySelectorAll('.mark').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.id;reviews[id]={...reviewOf(id),status:btn.dataset.status,updated_at:new Date().toISOString()};saveReviews()}));
   $('list').querySelectorAll('.note').forEach(el=>el.addEventListener('change',()=>{const id=el.dataset.id;reviews[id]={...reviewOf(id),note:el.value,updated_at:new Date().toISOString()};localStorage.setItem(storeKey(),JSON.stringify(reviews))}));
   $('list').querySelectorAll('.locate').forEach(btn=>btn.addEventListener('click',()=>focusBusiness(btn.dataset.id)));
