@@ -88,6 +88,9 @@ def classify(item, duplicate_names, legacy_names):
         flags.append("sem_site")
     if item.get("location", {}).get("coordinate_method") == "way_or_relation_center":
         flags.append("coordenada_de_centro_aproximado")
+    location = item.get("location") or {}
+    if location.get("latitude") is None or location.get("longitude") is None:
+        flags.append("sem_coordenadas")
     if not item.get("location", {}).get("latitude") or not item.get("location", {}).get("longitude"):
         flags.append("sem_coordenadas")
 
