@@ -26,7 +26,7 @@
       ],
       "zoom": 15,
       "enabled": true,
-      "data_ready": false
+      "data_ready": true
     }
   }
 }
