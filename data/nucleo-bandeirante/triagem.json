@@ -18,8 +18,8 @@
   "total_records": 139,
   "decision_counts": {
     "revisao_manual": 121,
-    "fora_da_vitrine_comercial": 4,
-    "revisao_de_escopo": 13,
+    "fora_da_vitrine_comercial": 3,
+    "revisao_de_escopo": 14,
     "reter_ate_confirmacao": 1
   },
   "records": [
@@ -134,11 +134,11 @@
       "external_id": "node/4597896294",
       "name": "Cartório 1 Ofício do Núcleo Bandeirante",
       "source_category": "Serviços profissionais",
-      "triage_category": "orgao_publico",
-      "decision": "fora_da_vitrine_comercial",
-      "confidence": "alta",
+      "triage_category": "servico_cartorial",
+      "decision": "revisao_de_escopo",
+      "confidence": "media",
       "reasons": [
-        "Marcado como órgão ou administração pública no OSM."
+        "Cartório identificado como serviço delegado; decidir se essa categoria integra a vitrine comercial."
       ],
       "flags": [
         "sem_logradouro",
