@@ -1,4 +1,4 @@
-name: DESCOM - Pesquisa e validação
+name: DESCOM - Descoberta e validação
 
 on:
   workflow_dispatch:
@@ -9,8 +9,8 @@ on:
         type: choice
         options:
           - validate
-          - search
-        default: search
+          - discover
+        default: discover
 
 permissions:
   contents: write
@@ -27,36 +27,32 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validar base JSON
+      - name: Validar descobertas
         if: inputs.action == 'validate'
         run: python scripts/main.py --validate
 
-      - name: Pesquisar e atualizar arquivos JSON
-        if: inputs.action == 'search'
-        env:
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-        run: python scripts/main.py --search
+      - name: Descobrir estabelecimentos
+        if: inputs.action == 'discover'
+        run: python scripts/main.py --discover
 
-      - name: Salvar base e carousel no repositório
-        if: inputs.action == 'search'
+      - name: Salvar descobertas no repositório
+        if: inputs.action == 'discover'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/nucleo-bandeirante/estabelecimentos.json carousel/empresas-carousel.json
+          git add data/nucleo-bandeirante/descobertas.json
           if ! git diff --cached --quiet; then
-            git commit -m "Atualiza empresas e carousel do DESCOM"
+            git commit -m "Atualiza descobertas comerciais do DESCOM"
             git push
           else
-            echo "Nenhuma alteração nos dados."
+            echo "Nenhuma alteração nas descobertas."
           fi
 
-      - name: Disponibilizar resultados para revisão
-        if: always() && inputs.action == 'search' && hashFiles('data/nucleo-bandeirante/estabelecimentos.json') != ''
+      - name: Disponibilizar arquivo para revisão
+        if: always() && inputs.action == 'discover' && hashFiles('data/nucleo-bandeirante/descobertas.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: descom-dados-e-carousel
-          path: |
-            data/nucleo-bandeirante/estabelecimentos.json
-            carousel/empresas-carousel.json
+          name: descom-descobertas-nucleo-bandeirante
+          path: data/nucleo-bandeirante/descobertas.json
           if-no-files-found: warn
           retention-days: 7
