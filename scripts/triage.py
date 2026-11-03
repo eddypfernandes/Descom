@@ -33,7 +33,12 @@ def classify(item, duplicate_names, legacy_names):
     decision = "revisao_manual"
     confidence = "media"
 
-    if tags.get("government") or tags.get("office") == "government":
+    if "cartorio" in key and tags.get("office") == "government":
+        category = "servico_cartorial"
+        decision = "revisao_de_escopo"
+        confidence = "media"
+        reasons.append("Cartório identificado como serviço delegado; decidir se essa categoria integra a vitrine comercial.")
+    elif tags.get("government") or tags.get("office") == "government":
         category = "orgao_publico"
         decision = "fora_da_vitrine_comercial"
         confidence = "alta"
