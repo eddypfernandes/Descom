@@ -30,7 +30,7 @@ header{background:var(--gc-primary);color:#fff}
  <div class="container">
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
    <div><div class="small text-white-50">DESCOM · BRASÍLIA/DF</div><h1 class="h4 mb-0">Revisão geográfica</h1></div>
-   <span class="badge text-bg-light">139 registros para conferir</span>
+   <span class="badge text-bg-light" id="region-total">Carregando registros…</span>
   </div>
   <p class="small text-white-50 mb-0 mt-2">Confira cada ponto no mapa e registre sua decisão. Nenhum dado original será alterado.</p>
  </div>
@@ -142,7 +142,7 @@ header{background:var(--gc-primary);color:#fff}
   try{
    const region=REGIONS[currentRegion];
    const [d,t]=await Promise.all([fetch(region.dataUrl),fetch(region.triageUrl)]);if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos da região selecionada.');
-   const discovery=await d.json(),triage=await t.json();businesses=discovery.establishments||[];(triage.records||[]).forEach(x=>triageById[x.id]=x);
+   const discovery=await d.json(),triage=await t.json();businesses=discovery.establishments||[];$('region-total').textContent=(discovery.total_records??businesses.length)+' registros para conferir';(triage.records||[]).forEach(x=>triageById[x.id]=x);
    readReviews();
    const cats=[...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
    cats.forEach(c=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(c)+'">'+esc(c)+'</option>'));
@@ -159,7 +159,7 @@ header{background:var(--gc-primary);color:#fff}
      const [d,t]=await Promise.all([fetch(cfg.dataUrl),fetch(cfg.triageUrl)]);
      if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos da região selecionada.');
      const discovery=await d.json(),triage=await t.json();
-     businesses=discovery.establishments||[];triageById={};(triage.records||[]).forEach(x=>triageById[x.id]=x);
+     businesses=discovery.establishments||[];$('region-total').textContent=(discovery.total_records??businesses.length)+' registros para conferir';triageById={};(triage.records||[]).forEach(x=>triageById[x.id]=x);
      reviews={};readReviews();activeId=null;
      $('category').innerHTML='<option value="">Todas</option>';
      [...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(cat=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(cat)+'">'+esc(cat)+'</option>'));
