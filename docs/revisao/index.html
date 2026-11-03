@@ -42,7 +42,7 @@ header{background:var(--gc-primary);color:#fff}
   <div class="row g-2 mb-3" id="summary"></div>
   <div class="sticky-tools">
    <div class="row g-2">
-    <div class="col-12 col-md-3"><label for="region" class="form-label small-muted mb-1">Região Administrativa</label><select id="region" class="form-select" aria-label="Selecionar Região Administrativa"><option value="nucleo-bandeirante" selected>Núcleo Bandeirante</option><option value="riacho-fundo-i">Riacho Fundo I</option></select></div>
+    <div class="col-12 col-md-3"><label for="region" class="form-label small-muted mb-1">Região Administrativa</label><select id="region" class="form-select" aria-label="Selecionar Região Administrativa"><option value="nucleo-bandeirante" selected>Núcleo Bandeirante</option></select></div>
     <div class="col-12 col-md-3"><label for="search" class="form-label small-muted mb-1">Estabelecimento</label><input id="search" class="form-control" placeholder="Buscar estabelecimento…" aria-label="Buscar estabelecimento"></div>
     <div class="col-6 col-md-2"><label for="category" class="form-label small-muted mb-1">Categoria</label><select id="category" class="form-select"><option value="">Todas</option></select></div>
     <div class="col-6 col-md-2"><label for="decision" class="form-label small-muted mb-1">Triagem</label><select id="decision" class="form-select"><option value="">Todas</option><option value="revisao_manual">Revisão manual</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter até confirmação</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option></select></div>
@@ -67,18 +67,26 @@ header{background:var(--gc-primary);color:#fff}
 <script>
 (() => {
  const DATA_BASE='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/';
- const REGIONS={
-  'nucleo-bandeirante':{
-   label:'Núcleo Bandeirante',city:'Brasília',center:[-15.8715,-47.9695],zoom:15,
-   dataUrl:DATA_BASE+'nucleo-bandeirante/descobertas.json',
-   triageUrl:DATA_BASE+'nucleo-bandeirante/triagem.json'
-  },
-  'riacho-fundo-i':{
-   label:'Riacho Fundo I',city:'Brasília',center:[-15.883,-48.019],zoom:15,
-   dataUrl:DATA_BASE+'riacho-fundo-i/descobertas.json',
-   triageUrl:DATA_BASE+'riacho-fundo-i/triagem.json'
-  }
- };
+ const REGION_CONFIG_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/config/regions.json';
+ let REGIONS={};
+ async function loadRegionConfig(){
+  const response=await fetch(REGION_CONFIG_URL);
+  if(!response.ok)throw new Error('Não foi possível carregar a configuração das regiões.');
+  const config=await response.json();
+  REGIONS={};
+  Object.entries(config.regions||{}).forEach(([key,region])=>{
+   if(!region.enabled)return;
+   REGIONS[key]={
+    label:region.label,city:config.city||'Brasília',
+    center:region.center||[-15.8715,-47.9695],zoom:region.zoom||15,
+    dataUrl:DATA_BASE+key+'/descobertas.json',
+    triageUrl:DATA_BASE+key+'/triagem.json'
+   };
+  });
+  if(!REGIONS[currentRegion])currentRegion=Object.keys(REGIONS)[0];
+  $('region').innerHTML=Object.entries(REGIONS).map(([key,region])=>'<option value="'+esc(key)+'">'+esc(region.label)+'</option>').join('');
+  $('region').value=currentRegion;
+ }
  let currentRegion='nucleo-bandeirante';
  let businesses=[], triageById={}, map, markers=[], activeId=null, selectedMapId=null, reviews={};
  const storeKey=()=>`descom_revisao_${currentRegion}_v1`;
@@ -157,6 +165,7 @@ header{background:var(--gc-primary);color:#fff}
  }
  async function start(){
   try{
+   await loadRegionConfig();
    const region=REGIONS[currentRegion];
    const [d,t]=await Promise.all([fetch(region.dataUrl),fetch(region.triageUrl)]);if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos da região selecionada.');
    const discovery=await d.json(),triage=await t.json();businesses=discovery.establishments||[];$('region-total').textContent=(discovery.total_records??businesses.length)+' registros para conferir';(triage.records||[]).forEach(x=>triageById[x.id]=x);
