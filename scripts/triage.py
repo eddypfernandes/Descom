@@ -4,12 +4,20 @@ import json, re, unicodedata
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+import argparse
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "data" / "nucleo-bandeirante"
-DISCOVERY = BASE / "descobertas.json"
-LEGACY = BASE / "estabelecimentos.json"
-OUTPUT = BASE / "triagem.json"
+REGIONS_FILE = ROOT / "config" / "regions.json"
+
+
+def region_paths(region_key):
+    with REGIONS_FILE.open(encoding="utf-8") as file:
+        config = json.load(file)
+    region = config.get("regions", {}).get(region_key)
+    if not region or not region.get("enabled"):
+        raise ValueError(f"Região não configurada ou desabilitada: {region_key}")
+    base = ROOT / "data" / region_key
+    return region, base / "descobertas.json", base / "estabelecimentos.json", base / "triagem.json"
 
 def norm(value):
     value = unicodedata.normalize("NFKD", str(value or "").casefold())
@@ -123,8 +131,12 @@ def classify(item, duplicate_names, legacy_names):
     }
 
 def main():
-    discoveries = read(DISCOVERY)
-    legacy = read(LEGACY) if LEGACY.exists() else {"establishments": []}
+    parser = argparse.ArgumentParser(description="DESCOM — triagem por região.")
+    parser.add_argument("--region", default="nucleo-bandeirante", help="Chave da região em config/regions.json.")
+    args = parser.parse_args()
+    region_config, discovery_path, legacy_path, output_path = region_paths(args.region)
+    discoveries = read(discovery_path)
+    legacy = read(legacy_path) if legacy_path.exists() else {"establishments": []}
     items = discoveries["establishments"]
     counts = defaultdict(int)
     names = defaultdict(int)
@@ -159,7 +171,9 @@ def main():
         "decision_counts": dict(counts),
         "records": records
     }
-    OUTPUT.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Região: {region_config['label']}")
     print(f"Triagem gerada: {len(records)} registros")
     for key, value in sorted(counts.items()):
         print(f"{key}: {value}")
