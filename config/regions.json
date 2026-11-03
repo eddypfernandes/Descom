@@ -13,7 +13,8 @@
         -47.9695
       ],
       "zoom": 15,
-      "enabled": true
+      "enabled": true,
+      "data_ready": true
     },
     "riacho-fundo-i": {
       "label": "Riacho Fundo I",
@@ -24,7 +25,8 @@
         -48.019
       ],
       "zoom": 15,
-      "enabled": true
+      "enabled": true,
+      "data_ready": false
     }
   }
 }
