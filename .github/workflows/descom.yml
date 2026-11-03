@@ -10,7 +10,8 @@ on:
         options:
           - validate
           - discover
-        default: discover
+          - triage
+        default: triage
 
 permissions:
   contents: write
@@ -35,24 +36,28 @@ jobs:
         if: inputs.action == 'discover'
         run: python scripts/main.py --discover
 
-      - name: Salvar descobertas no repositório
-        if: inputs.action == 'discover'
+      - name: Executar triagem automática
+        if: inputs.action == 'triage'
+        run: python scripts/triage.py
+
+      - name: Salvar resultados no repositório
+        if: inputs.action == 'discover' || inputs.action == 'triage'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/nucleo-bandeirante/descobertas.json
+          git add data/nucleo-bandeirante/descobertas.json data/nucleo-bandeirante/triagem.json
           if ! git diff --cached --quiet; then
-            git commit -m "Atualiza descobertas comerciais do DESCOM"
+            git commit -m "Atualiza resultados do DESCOM"
             git push
           else
-            echo "Nenhuma alteração nas descobertas."
+            echo "Nenhuma alteração nos resultados."
           fi
 
       - name: Disponibilizar arquivo para revisão
-        if: always() && inputs.action == 'discover' && hashFiles('data/nucleo-bandeirante/descobertas.json') != ''
+        if: always() && inputs.action == 'triage' && hashFiles('data/nucleo-bandeirante/triagem.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: descom-descobertas-nucleo-bandeirante
-          path: data/nucleo-bandeirante/descobertas.json
+          name: descom-triagem-nucleo-bandeirante
+          path: data/nucleo-bandeirante/triagem.json
           if-no-files-found: warn
           retention-days: 7
