@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "city": "Brasília",
+  "uf": "DF",
+  "source": "OpenStreetMap",
+  "regions": {
+    "nucleo-bandeirante": {
+      "label": "Núcleo Bandeirante",
+      "relation_id": 3359475,
+      "area_id": 3603359475,
+      "center": [
+        -15.8715,
+        -47.9695
+      ],
+      "zoom": 15,
+      "enabled": true
+    },
+    "riacho-fundo-i": {
+      "label": "Riacho Fundo I",
+      "relation_id": 3359481,
+      "area_id": 3603359481,
+      "center": [
+        -15.883,
+        -48.019
+      ],
+      "zoom": 15,
+      "enabled": true
+    }
+  }
+}
