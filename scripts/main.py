@@ -10,12 +10,12 @@ import hashlib
 import json
 import re
 import sys
-import time
 import unicodedata
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlencode
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,7 +111,7 @@ def classify(tags: dict[str, str]) -> str:
 def request_overpass() -> list[dict[str, Any]]:
     request = urllib.request.Request(
         OVERPASS_ENDPOINT,
-        data=OVERPASS_QUERY.encode("utf-8"),
+        data=urlencode({"data": OVERPASS_QUERY}).encode("utf-8"),
         headers={
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             "Accept": "application/json",
