@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "generated_at": null,
+  "region": "Riacho Fundo I",
+  "uf": "DF",
+  "source": "OpenStreetMap",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "Open Database License (ODbL)",
+  "method": "Triagem heurística por tags, nome, campos disponíveis e comparação literal com a base histórica.",
+  "limitations": [
+    "A triagem não confirma existência, funcionamento, endereço ou titularidade.",
+    "Nome igual não prova duplicidade; unidades diferentes podem compartilhar nome.",
+    "Nome diferente não prova que os registros sejam empresas distintas.",
+    "Coordenadas de way/relation podem representar centro aproximado.",
+    "Nenhum registro é publicado ou importado automaticamente."
+  ],
+  "source_file": "descobertas.json",
+  "total_records": 0,
+  "decision_counts": {},
+  "records": []
+}
