@@ -29,7 +29,7 @@ header{background:var(--gc-primary);color:#fff}
 <header class="py-3 mb-3">
  <div class="container">
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-   <div><div class="small text-white-50">DESCOM · NÚCLEO BANDEIRANTE</div><h1 class="h4 mb-0">Revisão geográfica</h1></div>
+   <div><div class="small text-white-50">DESCOM · BRASÍLIA/DF</div><h1 class="h4 mb-0">Revisão geográfica</h1></div>
    <span class="badge text-bg-light">139 registros para conferir</span>
   </div>
   <p class="small text-white-50 mb-0 mt-2">Confira cada ponto no mapa e registre sua decisão. Nenhum dado original será alterado.</p>
@@ -42,11 +42,12 @@ header{background:var(--gc-primary);color:#fff}
   <div class="row g-2 mb-3" id="summary"></div>
   <div class="sticky-tools">
    <div class="row g-2">
-    <div class="col-12 col-md-4"><input id="search" class="form-control" placeholder="Buscar estabelecimento…" aria-label="Buscar estabelecimento"></div>
-    <div class="col-6 col-md-3"><select id="category" class="form-select"><option value="">Todas as categorias</option></select></div>
-    <div class="col-6 col-md-3"><select id="decision" class="form-select"><option value="">Todas as triagens</option><option value="revisao_manual">Revisão manual</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter até confirmação</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option></select></div>
-    <div class="col-8 col-md-1"><select id="status" class="form-select" aria-label="Situação da revisão"><option value="">Todos</option><option value="pendente">Pendentes</option><option value="confirmado">Confirmados</option><option value="corrigir">Corrigir</option><option value="duplicado">Duplicados</option><option value="descartar">Descartar</option></select></div>
-    <div class="col-4 col-md-1 d-grid"><button id="clear" class="btn btn-outline-secondary" title="Limpar filtros">Limpar</button></div>
+    <div class="col-12 col-md-3"><label for="region" class="form-label small-muted mb-1">Região Administrativa</label><select id="region" class="form-select" aria-label="Selecionar Região Administrativa"><option value="nucleo-bandeirante" selected>Núcleo Bandeirante</option><option value="" disabled>Outras regiões serão habilitadas após configuração do DESCOM</option></select></div>
+    <div class="col-12 col-md-3"><label for="search" class="form-label small-muted mb-1">Estabelecimento</label><input id="search" class="form-control" placeholder="Buscar estabelecimento…" aria-label="Buscar estabelecimento"></div>
+    <div class="col-6 col-md-2"><label for="category" class="form-label small-muted mb-1">Categoria</label><select id="category" class="form-select"><option value="">Todas</option></select></div>
+    <div class="col-6 col-md-2"><label for="decision" class="form-label small-muted mb-1">Triagem</label><select id="decision" class="form-select"><option value="">Todas</option><option value="revisao_manual">Revisão manual</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter até confirmação</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option></select></div>
+    <div class="col-8 col-md-1"><label for="status" class="form-label small-muted mb-1">Revisão</label><select id="status" class="form-select" aria-label="Situação da revisão"><option value="">Todos</option><option value="pendente">Pendentes</option><option value="confirmado">Confirmados</option><option value="corrigir">Corrigir</option><option value="duplicado">Duplicados</option><option value="descartar">Descartar</option></select></div>
+    <div class="col-4 col-md-1 d-grid"><label class="form-label small-muted mb-1">Ações</label><button id="clear" class="btn btn-outline-secondary" title="Limpar filtros">Limpar</button></div>
    </div>
   </div>
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 my-3">
@@ -65,20 +66,27 @@ header{background:var(--gc-primary);color:#fff}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (() => {
- const DATA_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/descobertas.json';
- const TRIAGE_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/triagem.json';
- const STORE_KEY='descom_revisao_nb_v1';
+ const REGIONS={
+  'nucleo-bandeirante':{
+   label:'Núcleo Bandeirante',
+   city:'Brasília',
+   dataUrl:'https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/descobertas.json',
+   triageUrl:'https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/nucleo-bandeirante/triagem.json'
+  }
+ };
+ let currentRegion='nucleo-bandeirante';
  let businesses=[], triageById={}, map, markers=[], activeId=null, reviews={};
+ const storeKey=()=>`descom_revisao_${currentRegion}_v1`;
  const $=id=>document.getElementById(id);
  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const labelDecision={revisao_manual:'Revisão manual',revisao_de_escopo:'Revisão de escopo',reter_ate_confirmacao:'Reter até confirmação',fora_da_vitrine_comercial:'Fora da vitrine'};
  const labelStatus={pendente:'Pendente',confirmado:'Confirmado',corrigir:'Corrigir dados',duplicado:'Possível duplicado',descartar:'Descartar'};
  const addr=b=>[b.address?.street,b.address?.number,b.address?.neighborhood].filter(Boolean).join(', ')||'Endereço não informado';
  const coords=b=>Number.isFinite(Number(b.location?.latitude))&&Number.isFinite(Number(b.location?.longitude));
- function readReviews(){try{reviews=JSON.parse(localStorage.getItem(STORE_KEY)||'{}')}catch(e){reviews={}}}
- function saveReviews(){localStorage.setItem(STORE_KEY,JSON.stringify(reviews));renderSummary();renderList()}
+ function readReviews(){try{reviews=JSON.parse(localStorage.getItem(storeKey())||'{}')}catch(e){reviews={}}}
+ function saveReviews(){localStorage.setItem(storeKey(),JSON.stringify(reviews));renderSummary();renderList()}
  function reviewOf(id){return reviews[id]||{status:'pendente',note:''}}
- function mapsUrl(b){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((b.name||'estabelecimento')+' '+(addr(b))+' Núcleo Bandeirante Brasília')+'&query_place_id='}
+ function mapsUrl(b){const region=REGIONS[currentRegion];return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((b.name||'estabelecimento')+' '+addr(b)+' '+region.label+' '+region.city)+'&query_place_id='}
  function osmUrl(b){return b.contacts?.public_profile||'https://www.openstreetmap.org/?mlat='+b.location.latitude+'&mlon='+b.location.longitude+'#map=19/'+b.location.latitude+'/'+b.location.longitude}
  function filtered(){
   const q=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('category').value,dec=$('decision').value,st=$('status').value;
@@ -117,7 +125,7 @@ header{background:var(--gc-primary);color:#fff}
     '<div class="small-muted mt-2">ID: '+esc(b.external_id||b.id)+'</div></div></article>';
   }).join('')||'<div class="alert alert-light border">Nenhum registro encontrado com esses filtros.</div>';
   $('list').querySelectorAll('.mark').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.id;reviews[id]={...reviewOf(id),status:btn.dataset.status,updated_at:new Date().toISOString()};saveReviews()}));
-  $('list').querySelectorAll('.note').forEach(el=>el.addEventListener('change',()=>{const id=el.dataset.id;reviews[id]={...reviewOf(id),note:el.value,updated_at:new Date().toISOString()};localStorage.setItem(STORE_KEY,JSON.stringify(reviews))}));
+  $('list').querySelectorAll('.note').forEach(el=>el.addEventListener('change',()=>{const id=el.dataset.id;reviews[id]={...reviewOf(id),note:el.value,updated_at:new Date().toISOString()};localStorage.setItem(storeKey(),JSON.stringify(reviews))}));
   $('list').querySelectorAll('.locate').forEach(btn=>btn.addEventListener('click',()=>focusBusiness(btn.dataset.id)));
  }
  function focusBusiness(id){
@@ -126,21 +134,43 @@ header{background:var(--gc-primary);color:#fff}
   renderList();const card=$('card-'+id);if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
  }
  function exportReviews(){
-  const payload={generated_at:new Date().toISOString(),region:'Núcleo Bandeirante',source_file:'descobertas.json',review_records:Object.entries(reviews).map(([id,r])=>({id,...r})),attribution:'© OpenStreetMap contributors',license:'ODbL'};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='descom-revisao-nucleo-bandeirante.json';a.click();URL.revokeObjectURL(url);
+  const region=REGIONS[currentRegion];
+  const payload={generated_at:new Date().toISOString(),region:region.label,city:region.city,source_file:'descobertas.json',review_records:Object.entries(reviews).map(([id,r])=>({id,...r})),attribution:'© OpenStreetMap contributors',license:'ODbL'};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='descom-revisao-'+currentRegion+'.json';a.click();URL.revokeObjectURL(url);
  }
  async function start(){
   try{
-   const [d,t]=await Promise.all([fetch(DATA_URL),fetch(TRIAGE_URL)]);if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos do repositório.');
+   const region=REGIONS[currentRegion];
+   const [d,t]=await Promise.all([fetch(region.dataUrl),fetch(region.triageUrl)]);if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos da região selecionada.');
    const discovery=await d.json(),triage=await t.json();businesses=discovery.establishments||[];(triage.records||[]).forEach(x=>triageById[x.id]=x);
    readReviews();
    const cats=[...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
    cats.forEach(c=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(c)+'">'+esc(c)+'</option>'));
    $('loading').classList.add('d-none');$('app').classList.remove('d-none');initMap();renderSummary();renderMap(businesses);renderList();
    ['search','category','decision','status'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{renderMap(filtered());renderList()}));
+   $('region').addEventListener('change',async()=>{
+    const selected=$('region').value;
+    if(!REGIONS[selected])return;
+    currentRegion=selected;
+    $('loading').textContent='Carregando dados da região selecionada…';
+    $('loading').classList.remove('d-none');$('app').classList.add('d-none');$('error').classList.add('d-none');
+    try{
+     const cfg=REGIONS[currentRegion];
+     const [d,t]=await Promise.all([fetch(cfg.dataUrl),fetch(cfg.triageUrl)]);
+     if(!d.ok||!t.ok)throw new Error('Não foi possível carregar os arquivos públicos da região selecionada.');
+     const discovery=await d.json(),triage=await t.json();
+     businesses=discovery.establishments||[];triageById={};(triage.records||[]).forEach(x=>triageById[x.id]=x);
+     reviews={};readReviews();activeId=null;
+     $('category').innerHTML='<option value="">Todas</option>';
+     [...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(cat=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(cat)+'">'+esc(cat)+'</option>'));
+     $('search').value='';$('decision').value='';$('status').value='';
+     $('loading').classList.add('d-none');$('app').classList.remove('d-none');
+     renderSummary();renderMap(businesses);renderList();
+    }catch(err){$('loading').classList.add('d-none');$('error').textContent=err.message;$('error').classList.remove('d-none')}
+   });
    $('clear').addEventListener('click',()=>{['search','category','decision','status'].forEach(id=>$(id).value='');renderMap(businesses);renderList()});
    $('export').addEventListener('click',exportReviews);
-   $('reset').addEventListener('click',()=>{if(confirm('Apagar todas as marcações e observações salvas neste navegador?')){reviews={};localStorage.removeItem(STORE_KEY);renderSummary();renderList()}});
+   $('reset').addEventListener('click',()=>{if(confirm('Apagar todas as marcações e observações salvas neste navegador?')){reviews={};localStorage.removeItem(storeKey());renderSummary();renderList()}});
    $('result-count').textContent=businesses.length+' registros carregados.';
   }catch(e){$('loading').classList.add('d-none');$('error').textContent=e.message;$('error').classList.remove('d-none')}
  }
