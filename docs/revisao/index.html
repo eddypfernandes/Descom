@@ -70,7 +70,7 @@ header{background:var(--gc-primary);color:#fff}
  const REGION_CONFIG_URL='https://raw.githubusercontent.com/eddypfernandes/Descom/main/config/regions.json';
  let REGIONS={};
  async function loadRegionConfig(){
-  const response=await fetch(REGION_CONFIG_URL);
+  const response=await fetch(REGION_CONFIG_URL+'?v=20261103-1',{cache:'no-store'});
   if(!response.ok)throw new Error('Não foi possível carregar a configuração das regiões.');
   const config=await response.json();
   REGIONS={};
