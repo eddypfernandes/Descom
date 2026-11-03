@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 import unicodedata
 import urllib.error
 import urllib.request
@@ -24,7 +25,11 @@ CITY = "Brasília"
 UF = "DF"
 DATA_FILE = ROOT / "data" / "nucleo-bandeirante" / "estabelecimentos.json"
 DISCOVERY_FILE = ROOT / "data" / "nucleo-bandeirante" / "descobertas.json"
-OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
+OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
 USER_AGENT = "DESCOM/1.0 (GUIA COMERCIAL; public business discovery)"
 OVERPASS_QUERY = r"""
 [out:json][timeout:90];
@@ -109,29 +114,55 @@ def classify(tags: dict[str, str]) -> str:
     return "Serviços diversos"
 
 def request_overpass() -> list[dict[str, Any]]:
-    request = urllib.request.Request(
-        OVERPASS_ENDPOINT,
-        data=urlencode({"data": OVERPASS_QUERY}).encode("utf-8"),
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "Accept": "application/json",
-            "User-Agent": USER_AGENT,
-        },
-        method="POST",
+    data = urlencode({"data": OVERPASS_QUERY}).encode("utf-8")
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Accept": "application/json",
+        "User-Agent": USER_AGENT,
+    }
+    temporary_errors = {429, 502, 503, 504}
+    failures: list[str] = []
+
+    # Uma tentativa adicional no primeiro servidor; depois, alterna para
+    # instâncias públicas independentes, sem insistir excessivamente em nenhuma.
+    for endpoint_index, endpoint in enumerate(OVERPASS_ENDPOINTS):
+        attempts = 2 if endpoint_index == 0 else 1
+        for attempt in range(attempts):
+            request = urllib.request.Request(
+                endpoint, data=data, headers=headers, method="POST"
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=120) as response:
+                    payload = json.loads(response.read().decode("utf-8"))
+
+                elements = payload.get("elements")
+                if not isinstance(elements, list):
+                    raise RuntimeError("Resposta do Overpass sem lista de elementos.")
+                if not elements:
+                    raise RuntimeError(
+                        "Nenhum resultado encontrado. A área administrativa pode não estar mapeada com esse nome no OpenStreetMap."
+                    )
+                print(f"Fonte de consulta: {endpoint}")
+                return elements
+
+            except urllib.error.HTTPError as exc:
+                if exc.code not in temporary_errors:
+                    raise RuntimeError(
+                        f"OpenStreetMap respondeu HTTP {exc.code} em {endpoint}."
+                    ) from exc
+                failures.append(f"{endpoint}: HTTP {exc.code}")
+            except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                failures.append(f"{endpoint}: {exc}")
+
+            if attempt + 1 < attempts:
+                time.sleep(8)
+
+    details = " | ".join(failures)
+    raise RuntimeError(
+        "As instâncias públicas do Overpass estão temporariamente indisponíveis. "
+        "O DESCOM tentou novamente e alternou os servidores sem sucesso. "
+        f"Detalhes: {details}"
     )
-    try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        if exc.code in {429, 502, 503, 504}:
-            raise RuntimeError("O serviço público do OpenStreetMap está temporariamente ocupado. Tente novamente mais tarde.") from exc
-        raise RuntimeError(f"OpenStreetMap respondeu HTTP {exc.code}.") from exc
-    elements = payload.get("elements")
-    if not isinstance(elements, list):
-        raise RuntimeError("Resposta do OpenStreetMap sem lista de elementos.")
-    if not elements:
-        raise RuntimeError("Nenhum resultado encontrado. A área administrativa pode não estar mapeada com esse nome no OpenStreetMap.")
-    return elements
 
 def element_coordinates(element: dict[str, Any]) -> tuple[float | None, float | None, str]:
     if isinstance(element.get("lat"), (int, float)) and isinstance(element.get("lon"), (int, float)):
