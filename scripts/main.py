@@ -28,7 +28,7 @@ OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "DESCOM/1.0 (GUIA COMERCIAL; public business discovery)"
 OVERPASS_QUERY = r"""
 [out:json][timeout:90];
-area["name"="Núcleo Bandeirante"]["boundary"="administrative"]->.searchArea;
+area(3603359475)->.searchArea;
 (
   nwr(area.searchArea)["name"]["shop"];
   nwr(area.searchArea)["name"]["amenity"];
