@@ -20,20 +20,50 @@ from urllib.parse import urlencode
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-REGION = "Núcleo Bandeirante"
-CITY = "Brasília"
-UF = "DF"
-DATA_FILE = ROOT / "data" / "nucleo-bandeirante" / "estabelecimentos.json"
-DISCOVERY_FILE = ROOT / "data" / "nucleo-bandeirante" / "descobertas.json"
+REGIONS_FILE = ROOT / "config" / "regions.json"
+REGION_CONFIG: dict[str, Any] = {}
+REGION = ""
+CITY = ""
+UF = ""
+AREA_ID = 0
+DATA_FILE = Path()
+DISCOVERY_FILE = Path()
 OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
     "https://overpass.private.coffee/api/interpreter",
 ]
 USER_AGENT = "DESCOM/1.0 (GUIA COMERCIAL; public business discovery)"
-OVERPASS_QUERY = r"""
+def load_regions() -> dict[str, Any]:
+    with REGIONS_FILE.open(encoding="utf-8") as file:
+        data = json.load(file)
+    regions = data.get("regions")
+    if not isinstance(regions, dict) or not regions:
+        raise ValueError("config/regions.json não contém regiões configuradas.")
+    return data
+
+
+def configure_region(region_key: str, config: dict[str, Any]) -> None:
+    global REGION_CONFIG, REGION, CITY, UF, AREA_ID, DATA_FILE, DISCOVERY_FILE
+    regions = config.get("regions", {})
+    if region_key not in regions:
+        raise ValueError(f"Região não configurada: {region_key}")
+    REGION_CONFIG = regions[region_key]
+    if not REGION_CONFIG.get("enabled"):
+        raise ValueError(f"Região desabilitada: {region_key}")
+    REGION = str(REGION_CONFIG["label"])
+    CITY = str(config.get("city", "Brasília"))
+    UF = str(config.get("uf", "DF"))
+    AREA_ID = int(REGION_CONFIG["area_id"])
+    region_dir = ROOT / "data" / region_key
+    DATA_FILE = region_dir / "estabelecimentos.json"
+    DISCOVERY_FILE = region_dir / "descobertas.json"
+
+
+def build_overpass_query() -> str:
+    return f"""
 [out:json][timeout:90];
-area(3603359475)->.searchArea;
+area({AREA_ID})->.searchArea;
 (
   nwr(area.searchArea)["name"]["shop"];
   nwr(area.searchArea)["name"]["amenity"];
@@ -114,7 +144,7 @@ def classify(tags: dict[str, str]) -> str:
     return "Serviços diversos"
 
 def request_overpass() -> list[dict[str, Any]]:
-    data = urlencode({"data": OVERPASS_QUERY}).encode("utf-8")
+    data = urlencode({"data": build_overpass_query()}).encode("utf-8")
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Accept": "application/json",
@@ -379,11 +409,14 @@ def discover() -> tuple[int, int]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="DESCOM — descoberta própria de estabelecimentos.")
+    regions_config = load_regions()
+    parser.add_argument("--region", choices=sorted(regions_config["regions"]), default="nucleo-bandeirante", help="Região administrativa configurada.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--validate", action="store_true", help="Valida o arquivo de descobertas.")
     group.add_argument("--discover", action="store_true", help="Descobre estabelecimentos em dados abertos.")
     args = parser.parse_args()
     try:
+        configure_region(args.region, regions_config)
         if args.validate:
             data = load_json(DISCOVERY_FILE, {
                 "schema_version": "1.0", "region": REGION, "uf": UF, "establishments": []
