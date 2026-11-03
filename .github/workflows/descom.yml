@@ -12,6 +12,14 @@ on:
           - discover
           - triage
         default: triage
+      region:
+        description: "Região Administrativa"
+        required: true
+        type: choice
+        options:
+          - nucleo-bandeirante
+          - riacho-fundo-i
+        default: nucleo-bandeirante
 
 permissions:
   contents: write
@@ -30,22 +38,22 @@ jobs:
 
       - name: Validar descobertas
         if: inputs.action == 'validate'
-        run: python scripts/main.py --validate
+        run: python scripts/main.py --validate --region "${{ inputs.region }}"
 
       - name: Descobrir estabelecimentos
         if: inputs.action == 'discover'
-        run: python scripts/main.py --discover
+        run: python scripts/main.py --discover --region "${{ inputs.region }}"
 
       - name: Executar triagem automática
         if: inputs.action == 'triage'
-        run: python scripts/triage.py
+        run: python scripts/triage.py --region "${{ inputs.region }}"
 
       - name: Salvar resultados no repositório
         if: inputs.action == 'discover' || inputs.action == 'triage'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/nucleo-bandeirante/descobertas.json data/nucleo-bandeirante/triagem.json
+          git add "data/${{ inputs.region }}/descobertas.json" "data/${{ inputs.region }}/triagem.json"
           if ! git diff --cached --quiet; then
             git commit -m "Atualiza resultados do DESCOM"
             git push
@@ -57,7 +65,7 @@ jobs:
         if: always() && inputs.action == 'triage' && hashFiles('data/nucleo-bandeirante/triagem.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: descom-triagem-nucleo-bandeirante
-          path: data/nucleo-bandeirante/triagem.json
+          name: descom-triagem-${{ inputs.region }}
+          path: data/${{ inputs.region }}/triagem.json
           if-no-files-found: warn
           retention-days: 7
