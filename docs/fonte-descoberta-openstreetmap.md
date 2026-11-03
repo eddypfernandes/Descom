@@ -10,7 +10,7 @@ O Overpass é um serviço público de consulta somente leitura aos dados do Open
 
 ## O que a primeira versão faz
 
-1. Consulta a área administrativa do Núcleo Bandeirante no OpenStreetMap.
+1. Consulta a área administrativa do Núcleo Bandeirante no OpenStreetMap (relação OSM 3359475).
 2. Localiza elementos nomeados com tags comerciais e de serviços.
 3. Captura nome, categoria, endereço, contatos e coordenadas existentes.
 4. Mantém o identificador original do elemento OSM para atualizar o mesmo registro nas execuções seguintes.
