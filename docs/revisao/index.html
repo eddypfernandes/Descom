@@ -77,14 +77,14 @@ header{background:var(--gc-primary);color:#fff}
   Object.entries(config.regions||{}).forEach(([key,region])=>{
    if(!region.enabled)return;
    REGIONS[key]={
-    label:region.label,city:config.city||'Brasília',
+    label:region.label,ready:region.data_ready!==false,city:config.city||'Brasília',
     center:region.center||[-15.8715,-47.9695],zoom:region.zoom||15,
     dataUrl:DATA_BASE+key+'/descobertas.json',
     triageUrl:DATA_BASE+key+'/triagem.json'
    };
   });
   if(!REGIONS[currentRegion])currentRegion=Object.keys(REGIONS)[0];
-  $('region').innerHTML=Object.entries(REGIONS).map(([key,region])=>'<option value="'+esc(key)+'">'+esc(region.label)+'</option>').join('');
+  $('region').innerHTML=Object.entries(REGIONS).map(([key,region])=>'<option value="'+esc(key)+'">'+esc(region.label+(region.ready?'':' — coleta inicial pendente'))+'</option>').join('');
   $('region').value=currentRegion;
  }
  let currentRegion='nucleo-bandeirante';
