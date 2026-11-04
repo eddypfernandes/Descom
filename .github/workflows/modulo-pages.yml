@@ -9,6 +9,7 @@ on:
     paths:
       - "modulo/**"
       - "docs/central/**"
+      - ".github/workflows/modulo-pages.yml"
       - "data/nucleo-bandeirante/estabelecimentos.json"
       - "carousel/**"
       - ".github/workflows/modulo-pages.yml"
