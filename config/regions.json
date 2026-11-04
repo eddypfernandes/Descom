@@ -27,6 +27,18 @@
       "zoom": 15,
       "enabled": true,
       "data_ready": true
+    },
+    "taguatinga": {
+      "label": "Taguatinga",
+      "relation_id": 3359490,
+      "area_id": 3603359490,
+      "center": [
+        -15.8335277,
+        -48.0565716
+      ],
+      "zoom": 12,
+      "enabled": true,
+      "data_ready": true
     }
   }
 }
