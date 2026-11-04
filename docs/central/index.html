@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#142b28">
+<title>DESCOM | Central de operações</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+<style>
+:root{--side:#142b28;--side2:#1d3b36;--accent:#c99b4b;--paper:#f3f5f2;--ink:#24332e;--muted:#738078;--line:#e3e9e4;--green:#2d6656}
+*{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.93rem}
+.app-shell{min-height:100vh}.sidebar{width:252px;position:fixed;inset:0 auto 0 0;background:var(--side);color:#fff;padding:24px 16px;z-index:1030;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:0 10px 28px}.brand-icon{width:42px;height:42px;border:1px solid #ffffff35;border-radius:13px;display:grid;place-items:center;color:var(--accent);font-weight:800;font-size:1.25rem}.brand small{display:block;color:#aabbb3;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
+.nav-caption{font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;color:#82978d;padding:12px 12px 8px}.side-link{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:9px;color:#c8d4ce;text-decoration:none;margin:2px 0}.side-link:hover,.side-link.active{background:var(--side2);color:#fff}.side-link.active{box-shadow:inset 3px 0 var(--accent)}.side-icon{width:20px;text-align:center;color:var(--accent);font-size:1rem}.sidebar-foot{margin-top:auto;border-top:1px solid #ffffff1c;padding:16px 10px 0;color:#aabbb3;font-size:.76rem}
+.main{margin-left:252px;min-height:100vh}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px}.main-content{padding:30px 32px 42px;max-width:1600px;margin:auto}
+.eyebrow{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}.page-title{font-size:1.65rem;font-weight:750;letter-spacing:-.035em;margin:.2rem 0}.subtle{color:var(--muted)}
+.surface{background:#fff;border:1px solid var(--line);border-radius:14px}.metric-card{padding:18px 20px;height:100%;position:relative;overflow:hidden}.metric-label{color:var(--muted);font-size:.78rem;font-weight:600}.metric-value{font-size:1.8rem;letter-spacing:-.04em;font-weight:750;margin-top:8px}.metric-note{font-size:.72rem;color:var(--muted);margin-top:3px}.metric-mark{position:absolute;right:18px;top:18px;width:34px;height:34px;border-radius:10px;background:#eef3ef;color:var(--green);display:grid;place-items:center;font-weight:700}
+.section-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.section-body{padding:18px 20px}.section-title{font-weight:700;font-size:.96rem;margin:0}.badge-soft{background:#edf3ef;color:#315c4d;font-weight:650}.badge-warm{background:#f8f1e5;color:#86642e;font-weight:650}
+.form-select,.form-control{border-color:#dce4dd;font-size:.87rem;min-height:40px}.form-select:focus,.form-control:focus{border-color:#6e9a86;box-shadow:0 0 0 .2rem #2d66561a}
+.btn-primary{--bs-btn-bg:#245648;--bs-btn-border-color:#245648;--bs-btn-hover-bg:#193f35;--bs-btn-hover-border-color:#193f35;--bs-btn-active-bg:#193f35}
+.btn-outline-secondary{--bs-btn-color:#52625a;--bs-btn-border-color:#d7e0d9;--bs-btn-hover-bg:#edf2ee;--bs-btn-hover-color:#24332e;--bs-btn-hover-border-color:#d7e0d9}
+#map{height:390px;width:100%;border-radius:10px;background:#e9efea}.map-legend{font-size:.72rem;color:var(--muted)}.map-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2d6656;margin-right:5px}
+.table{--bs-table-bg:transparent;vertical-align:middle;font-size:.82rem}.table thead th{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#7b8981;font-weight:700;border-bottom-color:var(--line);white-space:nowrap}.table td{border-bottom-color:#edf1ed;padding-top:12px;padding-bottom:12px}.business-name{font-weight:650;color:#2a3932}.business-meta{font-size:.72rem;color:var(--muted);margin-top:3px}.status{font-size:.68rem;padding:5px 8px;border-radius:30px;white-space:nowrap}.status-review{background:#f7f0e4;color:#85652e}.status-out{background:#edf0ee;color:#66736b}.status-ok{background:#e8f2eb;color:#35694f}
+.flow-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid #edf1ed}.flow-item:last-child{border-bottom:0}.flow-number{width:27px;height:27px;flex:0 0 27px;border-radius:9px;background:#eef3ef;color:#315c4d;display:grid;place-items:center;font-size:.75rem;font-weight:750}.flow-item.current .flow-number{background:#f7f0e4;color:#8a672c}.flow-title{font-weight:650;font-size:.83rem}.flow-desc{font-size:.72rem;color:var(--muted);margin-top:2px}
+.data-foot{font-size:.72rem;color:var(--muted)}.mobile-toggle{display:none}
+@media(max-width:991.98px){.sidebar{transform:translateX(-100%);transition:transform .2s}.sidebar.show{transform:translateX(0)}.main{margin-left:0}.mobile-toggle{display:inline-flex}.topbar{padding:0 18px}.main-content{padding:24px 18px}}
+@media(max-width:575.98px){.main-content{padding:20px 13px 32px}.page-title{font-size:1.4rem}.topbar{height:62px}.hide-mobile{display:none!important}#map{height:300px}.metric-card{padding:15px}.metric-value{font-size:1.55rem}.section-body{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+ <div class="brand"><div class="brand-icon">D</div><div><div class="fw-bold fs-5">DESCOM</div><small>Desbravador Comercial</small></div></div>
+ <div class="nav-caption">Operação</div>
+ <a class="side-link active" href="#visao"><span class="side-icon">⌂</span>Visão geral</a>
+ <a class="side-link" href="#territorio"><span class="side-icon">⌖</span>Territórios</a>
+ <a class="side-link" href="#descobertas"><span class="side-icon">⌕</span>Estabelecimentos</a>
+ <a class="side-link" href="#fluxo"><span class="side-icon">⇄</span>Fluxo do ADÃO</a>
+ <div class="nav-caption mt-3">Gestão</div>
+ <a class="side-link" href="#revisao"><span class="side-icon">✓</span>Revisão humana</a>
+ <a class="side-link" href="#importacao"><span class="side-icon">⇧</span>Importações</a>
+ <a class="side-link" href="#historico"><span class="side-icon">◷</span>Histórico de tarefas</a>
+ <div class="sidebar-foot"><div class="d-flex align-items-center gap-2 mb-2"><span class="rounded-circle bg-success" style="width:7px;height:7px"></span><strong class="text-white">ADÃO</strong><span>· executor em preparação</span></div><div>Central administrativa DESCOM</div></div>
+</aside>
+<div class="main">
+ <header class="topbar">
+  <div class="d-flex align-items-center gap-3"><button class="btn btn-sm btn-outline-secondary mobile-toggle" id="menuToggle" aria-label="Abrir menu">☰</button><span class="small subtle">DESCOM <span class="mx-1">/</span> <strong class="text-dark">Central de operações</strong></span></div>
+  <div class="d-flex align-items-center gap-3"><span class="small subtle hide-mobile">Ambiente de demonstração</span><span class="badge rounded-pill text-bg-light border text-secondary">v1 · interface</span><div class="rounded-circle d-grid place-items-center fw-bold" style="width:34px;height:34px;background:#e9efea;color:#315c4d">A</div></div>
+ </header>
+ <main class="main-content">
+  <section id="visao" class="mb-4">
+   <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div><div class="eyebrow">Painel administrativo · ADÃO</div><h1 class="page-title">Central de operações</h1><p class="subtle mb-0">Descubra, investigue e prepare estabelecimentos para o Guia Comercial.</p></div>
+    <div class="d-flex gap-2"><button class="btn btn-outline-secondary btn-sm" id="refresh">↻ Atualizar dados</button><button class="btn btn-primary btn-sm" disabled title="Será habilitado quando a integração ASP e GitHub Actions estiver pronta">＋ Nova descoberta</button></div>
+   </div>
+   <div class="surface p-3 mb-4">
+    <div class="row g-3 align-items-end">
+     <div class="col-12 col-md-5 col-xl-4"><label for="region" class="form-label small fw-semibold mb-1">Território em operação</label><select class="form-select" id="region"><option value="nucleo-bandeirante">Núcleo Bandeirante · DF</option><option value="riacho-fundo-i">Riacho Fundo I · DF</option><option value="taguatinga">Taguatinga · DF</option></select></div>
+     <div class="col-12 col-md-7 col-xl-8"><div class="d-flex flex-wrap align-items-center justify-content-md-end gap-2"><span class="badge badge-soft rounded-pill px-3 py-2" id="sourceStatus">Conectando à base pública…</span><span class="small subtle" id="updatedAt">Aguardando leitura dos dados</span></div></div>
+    </div>
+   </div>
+   <div class="row g-3">
+    <div class="col-6 col-xl-3"><div class="surface metric-card"><div class="metric-label">Estabelecimentos descobertos</div><div class="metric-value" id="metricTotal">—</div><div class="metric-note">Registros na base da localidade</div><div class="metric-mark">⌕</div></div></div>
+    <div class="col-6 col-xl-3"><div class="surface metric-card"><div class="metric-label">Com coordenadas</div><div class="metric-value" id="metricGeo">—</div><div class="metric-note">Pontos disponíveis para mapa</div><div class="metric-mark">⌖</div></div></div>
+    <div class="col-6 col-xl-3"><div class="surface metric-card"><div class="metric-label">Sinalizados pela triagem</div><div class="metric-value" id="metricFlags">—</div><div class="metric-note">Precisam de conferência humana</div><div class="metric-mark">!</div></div></div>
+    <div class="col-6 col-xl-3"><div class="surface metric-card"><div class="metric-label">Fonte dos dados</div><div class="metric-value fs-4 mt-3">OpenStreetMap</div><div class="metric-note">Dados abertos · ODbL</div><div class="metric-mark">◎</div></div></div>
+   </div>
+  </section>
+  <section class="row g-3 mb-3" id="territorio">
+   <div class="col-12 col-xl-8">
+    <div class="surface h-100">
+     <div class="section-head"><div><h2 class="section-title">Mapa do território</h2><div class="data-foot mt-1">Distribuição geográfica dos estabelecimentos encontrados</div></div><span class="badge badge-soft rounded-pill">OpenStreetMap</span></div>
+     <div class="section-body"><div id="map"></div><div class="d-flex flex-wrap justify-content-between gap-2 mt-3 map-legend"><span><i class="map-dot"></i>Estabelecimento descoberto</span><span id="mapCount">Mapa aguardando dados</span></div></div>
+    </div>
+   </div>
+   <div class="col-12 col-xl-4" id="fluxo">
+    <div class="surface h-100">
+     <div class="section-head"><div><h2 class="section-title">Etapas do ADÃO</h2><div class="data-foot mt-1">Ciclo de descoberta comercial</div></div><span class="badge badge-warm rounded-pill">Em implantação</span></div>
+     <div class="section-body">
+      <div class="flow-item"><span class="flow-number">01</span><div><div class="flow-title">Cadastrar localidade</div><div class="flow-desc">Registro no banco operacional</div></div><span class="ms-auto badge badge-soft">Base</span></div>
+      <div class="flow-item"><span class="flow-number">02</span><div><div class="flow-title">Confirmar território</div><div class="flow-desc">Limites geográficos com aprovação humana</div></div><span class="ms-auto badge badge-soft">Base</span></div>
+      <div class="flow-item current"><span class="flow-number">03</span><div><div class="flow-title">Descobrir estabelecimentos</div><div class="flow-desc">Coleta e triagem automatizadas</div></div><span class="ms-auto badge badge-warm">Atual</span></div>
+      <div class="flow-item"><span class="flow-number">04</span><div><div class="flow-title">Investigar e revisar</div><div class="flow-desc">Fontes, correções e decisão humana</div></div></div>
+      <div class="flow-item"><span class="flow-number">05</span><div><div class="flow-title">Importar para o Guia</div><div class="flow-desc">Somente cadastros aprovados</div></div></div>
+     </div>
+    </div>
+   </div>
+  </section>
+  <section class="surface mb-3" id="descobertas">
+   <div class="section-head"><div><h2 class="section-title">Estabelecimentos descobertos</h2><div class="data-foot mt-1">Consulte os registros e selecione um ponto no mapa</div></div><span class="small subtle" id="recordCount">—</span></div>
+   <div class="section-body">
+    <div class="row g-2 mb-3"><div class="col-12 col-md-5"><input class="form-control" id="search" placeholder="Buscar por nome, categoria ou endereço"></div><div class="col-12 col-md-4"><select class="form-select" id="category"><option value="">Todas as categorias</option></select></div><div class="col-12 col-md-3"><select class="form-select" id="decision"><option value="">Todas as situações</option><option value="revisao_manual">Revisão manual</option><option value="fora_da_vitrine_comercial">Fora da vitrine</option><option value="revisao_de_escopo">Revisão de escopo</option><option value="reter_ate_confirmacao">Reter para confirmação</option><option value="revisar_possivel_duplicidade">Possível duplicidade</option></select></div></div>
+    <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Estabelecimento</th><th>Categoria</th><th>Localização</th><th>Triagem</th><th class="text-end">Mapa</th></tr></thead><tbody id="records"><tr><td colspan="5" class="text-center text-secondary py-5">Carregando registros…</td></tr></tbody></table></div>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3"><span class="data-foot">Exibindo até 60 registros por página. A base original permanece íntegra.</span><span class="data-foot" id="dataSource"></span></div>
+   </div>
+  </section>
+  <section class="row g-3" id="revisao">
+   <div class="col-12 col-lg-6"><div class="surface p-3 h-100"><div class="eyebrow mb-2">Revisão humana</div><h2 class="section-title mb-2">Decisão sempre supervisionada</h2><p class="small subtle mb-0">A classificação automática é apenas uma indicação. Identidade, funcionamento, endereço e adequação comercial precisam ser conferidos antes de qualquer aprovação.</p></div></div>
+   <div class="col-12 col-lg-6" id="importacao"><div class="surface p-3 h-100"><div class="eyebrow mb-2">Integração</div><h2 class="section-title mb-2">Access + GitHub Actions</h2><p class="small subtle mb-0">Esta versão apresenta dados públicos do repositório. Os comandos de execução e a persistência no Access serão conectados na etapa de integração ASP, sem expor credenciais no navegador.</p></div></div>
+  </section>
+  <footer class="data-foot mt-4 d-flex flex-wrap justify-content-between gap-2" id="historico"><span>DESCOM · Desbravador Comercial</span><span>Dados © OpenStreetMap contributors · ODbL</span></footer>
+ </main>
+</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(()=> {
+ const $=id=>document.getElementById(id);
+ const repo='https://raw.githubusercontent.com/eddypfernandes/Descom/main/data/';
+ const regions={
+  'nucleo-bandeirante':{label:'Núcleo Bandeirante · DF',center:[-15.8715,-47.9695],zoom:15},
+  'riacho-fundo-i':{label:'Riacho Fundo I · DF',center:[-15.883,-48.019],zoom:15},
+  'taguatinga':{label:'Taguatinga · DF',center:[-15.8335277,-48.0565716],zoom:12}
+ };
+ let map=null,layer=null,all=[],triage=new Map(),markers=new Map(),selected=null;
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const coord=b=>{const p=b.location||{};return Number.isFinite(+p.latitude)&&Number.isFinite(+p.longitude)?[+p.latitude,+p.longitude]:null};
+ const address=b=>{const a=b.address||{};return [a.street,a.number,a.neighbourhood||a.suburb||a.neighborhood].filter(Boolean).join(', ')||'Endereço não informado'};
+ function mapInit(region){if(map)map.remove();map=L.map('map',{scrollWheelZoom:false}).setView(region.center,region.zoom);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);layer=L.featureGroup().addTo(map);markers.clear()}
+ function statusFor(b){const t=triage.get(String(b.id||b.external_id||''));return t?.decision||'aguardando_triagem'}
+ function statusLabel(s){return ({revisao_manual:'Revisão manual',fora_da_vitrine_comercial:'Fora da vitrine',revisao_de_escopo:'Revisão de escopo',reter_ate_confirmacao:'Reter / confirmar',revisar_possivel_duplicidade:'Possível duplicidade',aguardando_triagem:'Sem triagem'})[s]||s}
+ function render(){const q=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('category').value,decision=$('decision').value;
+  const filtered=all.filter(b=>{const text=[b.name,b.category,address(b)].join(' ').toLocaleLowerCase('pt-BR');const s=statusFor(b);return(!q||text.includes(q))&&(!cat||b.category===cat)&&(!decision||s===decision)});
+  $('recordCount').textContent=filtered.length.toLocaleString('pt-BR')+' registros';$('records').innerHTML=filtered.slice(0,60).map(b=>{const id=String(b.id||b.external_id||''),s=statusFor(b),p=coord(b);let cls=s==='fora_da_vitrine_comercial'?'status-out':s==='aguardando_triagem'?'status-ok':'status-review';return '<tr><td><div class="business-name">'+esc(b.name||'Estabelecimento sem nome')+'</div><div class="business-meta">'+esc(b.external_id||id)+'</div></td><td>'+esc(b.category||'—')+'</td><td>'+esc(address(b))+'</td><td><span class="status '+cls+'">'+esc(statusLabel(s))+'</span></td><td class="text-end">'+(p?'<button class="btn btn-sm btn-outline-secondary locate" data-id="'+esc(id)+'">Ver ponto</button>':'<span class="text-secondary">—</span>')+'</td></tr>'}).join('')||'<tr><td colspan="5" class="text-center text-secondary py-4">Nenhum registro corresponde aos filtros.</td></tr>';
+  document.querySelectorAll('.locate').forEach(btn=>btn.addEventListener('click',()=>select(btn.dataset.id)));
+ }
+ function select(id){selected=id;const marker=markers.get(id);if(marker){map.setView(marker.getLatLng(),17);marker.openPopup()}document.querySelectorAll('.locate').forEach(b=>b.classList.toggle('active',b.dataset.id===id))}
+ async function load(){const key=$('region').value,region=regions[key];$('sourceStatus').textContent='Carregando dados…';$('records').innerHTML='<tr><td colspan="5" class="text-center text-secondary py-5">Consultando base pública…</td></tr>';
+  try{const [d,t]=await Promise.all([fetch(repo+key+'/descobertas.json'),fetch(repo+key+'/triagem.json')]);if(!d.ok)throw Error('Ainda não há arquivo de descobertas publicado para esta localidade.');const data=await d.json();const tri=t.ok?await t.json():{records:[]};all=data.establishments||[];triage=new Map((tri.records||[]).map(x=>[String(x.id||x.external_id||''),x]));mapInit(region);let geo=0,flagged=0;const bounds=[];
+   all.forEach(b=>{const p=coord(b);if(!p)return;geo++;const id=String(b.id||b.external_id||'');const m=L.circleMarker(p,{radius:5,color:'#245648',weight:1,fillColor:'#4b8a70',fillOpacity:.78}).bindPopup('<strong>'+esc(b.name||'Sem nome')+'</strong><br><small>'+esc(b.category||'')+'</small><br><small>'+esc(address(b))+'</small>').addTo(layer);m.on('click',()=>{selected=id});markers.set(id,m);bounds.push(p);});
+   flagged=[...triage.values()].filter(x=>(x.flags||[]).length>0||!['fora_da_vitrine_comercial'].includes(x.decision)).length;
+   $('metricTotal').textContent=all.length.toLocaleString('pt-BR');$('metricGeo').textContent=geo.toLocaleString('pt-BR');$('metricFlags').textContent=flagged.toLocaleString('pt-BR');$('mapCount').textContent=geo.toLocaleString('pt-BR')+' pontos no mapa';$('sourceStatus').textContent='Dados carregados';$('sourceStatus').className='badge badge-soft rounded-pill px-3 py-2';$('updatedAt').textContent='Atualizado em '+new Date(data.generated_at||Date.now()).toLocaleString('pt-BR');$('dataSource').textContent='Arquivo: data/'+key+'/descobertas.json';
+   const cats=[...new Set(all.map(x=>x.category).filter(Boolean))].sort();$('category').innerHTML='<option value="">Todas as categorias</option>'+cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');render();if(bounds.length)map.fitBounds(bounds,{padding:[20,20],maxZoom:15});else map.setView(region.center,region.zoom);
+  }catch(e){all=[];triage.clear();$('metricTotal').textContent='—';$('metricGeo').textContent='—';$('metricFlags').textContent='—';$('sourceStatus').textContent='Dados indisponíveis';$('updatedAt').textContent=e.message;$('mapCount').textContent='Sem dados para exibir';$('records').innerHTML='<tr><td colspan="5" class="text-center text-secondary py-5">'+esc(e.message)+'</td></tr>';if(map)mapInit(region)}
+ }
+ $('region').addEventListener('change',load);$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('category').addEventListener('change',render);$('decision').addEventListener('change',render);$('menuToggle').addEventListener('click',()=>$('sidebar').classList.toggle('show'));document.querySelectorAll('.side-link').forEach(a=>a.addEventListener('click',()=>{$('sidebar').classList.remove('show');document.querySelectorAll('.side-link').forEach(x=>x.classList.remove('active'));a.classList.add('active')}));load();
+})();
+</script>
+</body>
+</html>
