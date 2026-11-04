@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - "modulo/**"
+      - "docs/central/**"
       - "data/nucleo-bandeirante/estabelecimentos.json"
       - "carousel/**"
       - ".github/workflows/modulo-pages.yml"
@@ -36,7 +37,8 @@ jobs:
 
       - name: Preparar arquivos do site
         run: |
-          mkdir -p site/data/nucleo-bandeirante site/carousel
+          mkdir -p site/data/nucleo-bandeirante site/carousel site/central
+          cp -R docs/central/. site/central/
           cp -R modulo/. site/
           cp data/nucleo-bandeirante/estabelecimentos.json site/data/nucleo-bandeirante/estabelecimentos.json
           cp carousel/empresas-carousel.json site/carousel/empresas-carousel.json
