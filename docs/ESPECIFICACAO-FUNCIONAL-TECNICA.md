@@ -343,3 +343,94 @@ Nenhuma etapa deverá quebrar o layout aprovado ou eliminar dados/histórico exi
 ---
 
 **Regra de manutenção deste dossiê:** decisões aprovadas devem ser registradas aqui antes de mudanças relevantes. Ao concluir uma implementação, atualizar a seção de estado atual, distinguindo claramente implementado, testado e publicado. Nunca marcar como concluído algo que tenha sido apenas planejado ou revisado estaticamente.
+
+
+---
+
+# ADENDO DE CONTINUIDADE — 04/11/2026
+
+Este adendo prevalece sobre descrições anteriores de interface e sequência de implementação quando houver divergência. O histórico abaixo foi mantido para preservar decisões anteriores; o estado real está discriminado entre implementado, configurado e pendente.
+
+## A. Direção de interface atual
+
+Foi criada uma nova central administrativa independente em `docs/central/index.html`. Ela passa a ser a nova direção visual do painel DESCOM/ADÃO. Os arquivos anteriores foram preservados:
+
+- `docs/revisao/index.html`: painel de revisão/geografia anteriormente aprovado; não substituir nem alterar sem necessidade concreta.
+- `docs/revisao/operacao.html`: prévia operacional anterior, mantida como referência.
+- `docs/central/index.html`: nova central administrativa, com Bootstrap 5.3.3 e Leaflet 1.9.4.
+
+A nova central apresenta navegação por áreas, indicadores, seleção de localidade, mapa, busca, filtros e listagem de estabelecimentos. Consulta os JSON públicos existentes no repositório para descobertas e triagem. É uma interface de prévia conectada aos arquivos públicos, não uma aplicação operacional integrada ao Access.
+
+A publicação foi adicionada ao workflow existente `.github/workflows/modulo-pages.yml`, copiando `docs/central/` para `site/central/`. O endereço esperado é `/Descom/central/`. A configuração do workflow foi commitada; a publicação efetiva no Pages ainda precisa ser confirmada no histórico de execução do GitHub Actions.
+
+## B. Banco operacional e conexão ASP — aprovados pelo usuário
+
+O usuário forneceu e confirmou a estrutura do banco Access `descom.accdb`, com estas 11 tabelas:
+
+1. `tb_localidades`
+2. `tb_regioes_tecnicas`
+3. `tb_estabelecimentos`
+4. `tb_coletas`
+5. `tb_revisoes`
+6. `tb_fontes_dados`
+7. `tb_investigacoes`
+8. `tb_fila_tarefas`
+9. `tb_historico_status`
+10. `tb_importacoes`
+11. `tb_prospeccao`
+
+Os índices únicos e relacionamentos apresentados pelo usuário fazem parte da estrutura aprovada. Não recriar tabelas, não propor banco paralelo e não reabrir a auditoria estrutural sem evidência concreta de problema.
+
+A conexão Classic ASP informada utiliza `ADODB.Connection`, `Microsoft.ACE.OLEDB.12.0`, caminho resolvido por `Server.MapPath("/bd/descom.accdb")` e objeto global `connAdao`. O usuário declarou a conexão e o banco corretos. Considerá-los base aprovada para a implementação.
+
+## C. Arquitetura operacional definida
+
+- **Painel:** nova central administrativa como interface de operação do ADÃO.
+- **Classic ASP/IIS:** camada de servidor para autenticação, autorização, comandos, validação e acesso ao Access.
+- **Access:** persistência operacional nas 11 tabelas aprovadas.
+- **GitHub Actions:** executor assíncrono das rotinas Python já existentes.
+- **Python/JSON:** coleta, geografia e triagem; os JSON versionados continuam preservados como dados e trilha de execução enquanto a integração é construída.
+
+O navegador nunca receberá token do GitHub. A comunicação com Actions deverá ocorrer pelo servidor ASP, com segredo mantido exclusivamente no servidor. O runner do GitHub não acessará diretamente o arquivo Access local do IIS. O retorno deverá ser enviado de volta ao ASP por mecanismo autenticado ou obtido pelo ASP de forma segura.
+
+## D. Estado real após a criação da nova central
+
+### Implementado no repositório
+- Nova interface em `docs/central/index.html`.
+- Consulta dos arquivos `descobertas.json` e `triagem.json` por localidade para exibir os dados disponíveis.
+- Mapa Leaflet, busca, filtros, indicadores e listagem.
+- Preservação dos painéis anteriores e dos dados existentes.
+- Workflow Pages ajustado para incluir a pasta `docs/central/` na publicação.
+
+### Existente anteriormente e mantido
+- Workflow `.github/workflows/descom.yml` com ações de validação, descoberta, triagem e geografia.
+- `scripts/main.py`, `scripts/triage.py` e `scripts/geography.py`.
+- Configurações em `config/regions.json`.
+- Arquivos JSON por localidade, incluindo a base já coletada de Taguatinga.
+- Banco Access e painel Classic ASP no ambiente local do usuário (não versionados neste repositório).
+
+### Ainda não implementado / não confirmado
+- Publicação efetiva da nova central no GitHub Pages (workflow configurado; execução ainda não confirmada).
+- Comandos reais no painel para iniciar descoberta e outras tarefas.
+- Integração ASP → GitHub Actions autenticada.
+- Retorno de status e resultados das Actions ao ASP.
+- Gravação idempotente dos resultados nas tabelas Access.
+- Fila operacional persistente e acompanhamento de tarefas pelo painel.
+- Investigação aprofundada de estabelecimentos e persistência de fontes.
+- Revisão humana persistente no servidor.
+- Importação idempotente para a base do Guia Comercial.
+
+## E. Próxima entrega técnica — sem reiniciar o projeto
+
+A próxima entrega é a integração vertical mínima e funcional, nesta ordem:
+
+1. Instalar a nova central no ambiente ASP, mantendo a interface e adaptando somente os caminhos/contratos necessários.
+2. Criar uma única camada ASP autenticada para receber comandos do painel e acionar o workflow existente.
+3. Registrar a solicitação e a execução nas tabelas operacionais já existentes.
+4. Fazer o executor devolver o resultado ao servidor ASP de forma autenticada.
+5. Persistir estabelecimentos e histórico no Access sem duplicar registros.
+6. Atualizar a central para exibir estado real da execução e dados persistidos.
+7. Testar o ciclo completo em uma localidade já habilitada antes de expandir.
+
+Não criar outro painel, outro banco, tabelas adicionais ou workflows redundantes. Não limpar JSONs nem recomeçar coleta. Não declarar o ciclo completo até que uma execução real seja disparada pelo painel, retorne ao ASP, grave no Access e apareça novamente na interface.
+
