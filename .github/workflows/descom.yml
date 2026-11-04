@@ -76,7 +76,7 @@ jobs:
           if [ "${{ inputs.action }}" = "geography" ]; then
             git add data/geography-pending/
           else
-            git add "data/${{ inputs.region }}/descobertas.json" "data/${{ inputs.region }}/triagem.json"
+            git add "data/${{ inputs.region }}/"
           fi
           if ! git diff --cached --quiet; then
             git commit -m "Atualiza resultados do DESCOM"
