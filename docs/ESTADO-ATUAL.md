@@ -2,7 +2,7 @@
 
 **Atualizado em:** 04/11/2026  
 **Repositório:** `eddypfernandes/Descom`  
-**Commit desta atualização:** `01561c146e387dfb877f6360e989cbde1f7ac89a`
+**Commit de referência:** `5b0bb4ecd28cf7fc4bf82cea2b0f32b66bdd2ea5`
 
 Este documento registra o estado confirmado do repositório. Requisitos não são tratados como implementação.
 
@@ -11,7 +11,8 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 - `docs/revisao/index.html`: painel geográfico/revisão já aprovado. **Não alterar sem autorização específica.**
 - Dados existentes em `data/`: preservados; não limpar nem sobrescrever em uma reconstrução.
 - Scripts Python e documentação existentes: aproveitar como base.
-- `docs/revisao/operacao.html`: prévia visual independente, criada para validar a futura central de comando. Não substitui o painel aprovado e não se conecta ao Access nem dispara Actions.
+- `docs/revisao/operacao.html`: prévia visual anterior, preservada como referência.
+- `docs/central/index.html`: nova central administrativa DESCOM, criada separadamente. Interface responsiva com navegação, indicadores, mapa, filtros e listagem alimentados pelos JSON públicos do repositório. Não substitui os painéis anteriores.
 
 ## O que existe e foi confirmado no GitHub
 
@@ -20,7 +21,7 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 - `scripts/triage.py`: classificação heurística, flags e decisões de revisão; saída `triagem.json`. Não confirma funcionamento nem identidade comercial.
 - `scripts/geography.py`: pesquisa Nominatim e gera candidatos geográficos pendentes. Não aprova nem ativa automaticamente regiões.
 - `config/regions.json`: Núcleo Bandeirante, Riacho Fundo I e Taguatinga habilitados.
-- `data/taguatinga/descobertas.json` e `triagem.json`: base de Taguatinga existente (647 registros na coleta anteriormente confirmada).
+- `data/taguatinga/descobertas.json` e `triagem.json`: base de Taguatinga existente (647 registros na coleta anteriormente confirmada). A nova central consulta os arquivos de descobertas e triagem por localidade.
 - `docs/revisao/index.html`: página de revisão com mapa, filtros e marcações locais; a seleção atual de marcador filtra a lista e deve ser ajustada no futuro para preservar contexto.
 - `/admin/adao/` e `/admin/bd/descom.accdb`: existem no ambiente local do usuário, mas não estão versionados neste repositório. Não foram auditados neste turno.
 - Não existe endpoint ASP↔GitHub confirmado neste repositório.
@@ -34,23 +35,18 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 5. Painel ASP não comanda nem acompanha a execução GitHub.
 6. “Buscar mais detalhes” por empresa e revisão persistente no servidor ainda não estão integrados.
 7. Importação idempotente de aprovados para o Guia Comercial ainda não foi implementada.
-8. Prévia `operacao.html` é visual/demonstrativa; botão de descoberta não executa operação real.
+8. A nova central ainda não dispara operações reais; os comandos permanecem desabilitados até a integração autenticada com ASP e GitHub Actions.
 
 ## Direção técnica consolidada
 
-- Painel ASP é o centro de comando e revisão humana.
+- A nova central em `docs/central/index.html` é a direção visual aprovada para o centro de comando. A implementação operacional final será servida pelo ambiente ASP; GitHub Pages é apenas prévia de interface.
 - `descom.accdb` mantém localidades, solicitações, resultados e decisões operacionais.
 - GitHub Actions executa tarefas Python; não acessa diretamente o arquivo Access do IIS.
-- Integração deverá ser desenhada após auditoria dos ASPs e das 11 tabelas Access existentes. Não criar endpoint ou tabelas duplicadas antes dessa conferência.
+- O usuário confirmou como aprovadas as 11 tabelas Access e a conexão `connAdao` baseada em ACE OLEDB 12.0. Não reabrir essa verificação nem criar tabelas duplicadas.
 - Preferir um fluxo integrado de descoberta + triagem e uma integração central autenticada, com retorno idempotente ao servidor.
 - Nenhum registro bruto pode ser importado/publicado sem aprovação humana.
 - Não apagar dados históricos. Qualquer limpeza futura exige cópia/arquivo e confirmação de integridade.
 
 ## Próxima ação objetiva
 
-Auditar em conjunto, sem pedir testes repetitivos:
-- ASPs usados por `/admin/adao/` e conexão Access;
-- nomes/campos/relacionamentos das tabelas de `descom.accdb`;
-- configuração atual do IIS/hosting necessária para chamadas HTTPS.
-
-Depois disso, definir e implementar a integração única e testar no ambiente de desenvolvimento. A página `operacao.html` serve como referência visual; o painel ASP real será integrado sem substituir o layout aprovado.
+Próxima etapa: integrar a central administrativa ao ambiente ASP e conectar, por uma integração autenticada única, o painel ao GitHub Actions e o retorno das execuções ao Access. A estrutura das 11 tabelas e a conexão foram consideradas aprovadas pelo usuário. Preservar os dados e os painéis anteriores.
