@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173f35">
+<title>DESCOM | Central de comando — prévia</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+<style>
+:root{--gc:#173f35;--gc2:#245648;--gold:#e9a83b;--bg:#f7f8f5;--ink:#28352f;--muted:#68736c;--line:#e4e9e3}
+body{background:var(--bg);color:var(--ink);font-size:.94rem}
+.topbar{background:var(--gc);color:#fff}.brand-mark{width:38px;height:38px;border:1px solid #ffffff50;border-radius:10px;display:grid;place-items:center;font-weight:700}
+.btn-gc{background:var(--gc);color:#fff}.btn-gc:hover{background:var(--gc2);color:#fff}
+.btn-outline-gc{border-color:var(--gc);color:var(--gc)}.btn-outline-gc:hover{background:var(--gc);color:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px}.step{display:flex;gap:.7rem;align-items:flex-start}.step-no{width:27px;height:27px;border-radius:50%;background:#e8eee9;color:var(--gc);display:grid;place-items:center;font-weight:700;flex:0 0 auto}.step.done .step-no{background:var(--gc);color:white}.step.active .step-no{background:var(--gold);color:#3a2b0c}
+#map{height:440px;border-radius:12px;border:1px solid var(--line)}.company-row{border:1px solid var(--line);border-radius:10px;background:white;cursor:pointer}.company-row:hover,.company-row.active{border-color:var(--gc);box-shadow:0 0 0 2px #173f3510}.company-row.active{background:#f2f6f2}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#e9a83b}.tiny{font-size:.78rem;color:var(--muted)}.pill{background:#e8eee9;color:var(--gc);font-size:.75rem}.metric{font-size:1.45rem;font-weight:700;color:var(--gc)}
+@media(max-width:767px){#map{height:330px}.mobile-order-map{order:1}.mobile-order-list{order:2}}
+</style>
+</head>
+<body>
+<header class="topbar py-3">
+ <div class="container">
+  <div class="d-flex align-items-center justify-content-between gap-3">
+   <div class="d-flex align-items-center gap-3"><div class="brand-mark">D</div><div><div class="fw-bold fs-5">DESCOM <span class="fw-normal opacity-75">/ ADÃO</span></div><div class="small opacity-75">Central de comando · prévia de interface</div></div></div>
+   <span class="badge text-bg-warning text-dark">PROTÓTIPO VISUAL</span>
+  </div>
+ </div>
+</header>
+<main class="container py-4">
+ <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+  <div><div class="small text-uppercase fw-semibold text-secondary">Área de trabalho</div><h1 class="h3 mb-1">Descoberta comercial</h1><p class="text-secondary mb-0">Acompanhe o ADÃO, confira o território e revise os estabelecimentos.</p></div>
+  <div class="d-flex gap-2"><button class="btn btn-outline-gc" id="reload">Atualizar dados</button><button class="btn btn-gc" id="discover">▶ Descobrir empresas</button></div>
+ </div>
+ <div class="panel p-3 p-lg-4 mb-4">
+  <div class="row g-3 align-items-center">
+   <div class="col-12 col-lg-4"><label for="locality" class="form-label fw-semibold">Localidade selecionada</label><select class="form-select" id="locality"><option value="taguatinga">Taguatinga · DF</option><option value="nucleo-bandeirante">Núcleo Bandeirante · DF</option><option value="riacho-fundo-i">Riacho Fundo I · DF</option></select><div class="tiny mt-2">Base demonstrativa disponível: Taguatinga.</div></div>
+   <div class="col-6 col-lg-2"><div class="tiny">Estabelecimentos</div><div class="metric" id="total">—</div></div>
+   <div class="col-6 col-lg-2"><div class="tiny">Para revisão</div><div class="metric" id="pending">—</div></div>
+   <div class="col-12 col-lg-4"><div class="d-flex justify-content-between tiny mb-1"><span>Etapas do fluxo</span><span>2 de 5</span></div><div class="progress" role="progressbar" aria-label="Etapas" style="height:8px"><div class="progress-bar" style="width:40%;background:var(--gold)"></div></div><div class="tiny mt-2">Geografia aprovada · descoberta disponível</div></div>
+  </div>
+ </div>
+ <div class="row g-4">
+  <div class="col-12 col-lg-3">
+   <div class="panel p-3 p-lg-4 h-100">
+    <h2 class="h6 fw-bold mb-3">Fluxo do ADÃO</h2>
+    <div class="d-grid gap-3">
+     <div class="step done"><span class="step-no">1</span><div><div class="fw-semibold">Localidade</div><div class="tiny">Taguatinga · DF</div></div></div>
+     <div class="step done"><span class="step-no">2</span><div><div class="fw-semibold">Geografia</div><div class="tiny text-success">Área configurada</div></div></div>
+     <div class="step active"><span class="step-no">3</span><div><div class="fw-semibold">Descoberta</div><div class="tiny">647 registros coletados</div></div></div>
+     <div class="step"><span class="step-no">4</span><div><div class="fw-semibold">Revisão humana</div><div class="tiny">Aprovar, corrigir ou rejeitar</div></div></div>
+     <div class="step"><span class="step-no">5</span><div><div class="fw-semibold">Importação</div><div class="tiny">Somente aprovados</div></div></div>
+    </div>
+    <hr>
+    <div class="alert alert-light border small mb-0"><strong>Segurança:</strong> descoberta não publica nem importa automaticamente.</div>
+   </div>
+  </div>
+  <div class="col-12 col-lg-9">
+   <div class="panel p-3 p-lg-4 mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><div><h2 class="h6 fw-bold mb-1">Mapa de estabelecimentos</h2><div class="tiny">Selecione um marcador ou um item da lista. Os demais pontos permanecem visíveis.</div></div><span class="badge pill">OpenStreetMap · ODbL</span></div>
+    <div id="map"></div>
+   </div>
+   <div class="panel p-3 p-lg-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"><h2 class="h6 fw-bold mb-0">Resultados da descoberta</h2><span class="tiny" id="resultCount">Carregando base…</span></div>
+    <div class="row g-2 mb-3"><div class="col-12 col-md-6"><input class="form-control" id="search" placeholder="Buscar nome, endereço ou categoria…"></div><div class="col-12 col-md-4"><select class="form-select" id="category"><option value="">Todas as categorias</option></select></div><div class="col-12 col-md-2"><button class="btn btn-outline-secondary w-100" id="clear">Limpar</button></div></div>
+    <div id="list" class="d-grid gap-2"></div><div class="tiny mt-3">A lista apresenta uma amostra de até 100 registros para manter a interface fluida. A base integral permanece no arquivo de origem.</div>
+   </div>
+  </div>
+ </div>
+ <div class="small text-secondary mt-4"><strong>Prévia:</strong> interface independente para validação visual. Ainda não envia comandos ao GitHub Actions nem grava no Access/ASP.</div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(()=>{const $=id=>document.getElementById(id);let all=[],markers=new Map(),active=null,map;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const coords=b=>{const p=b?.location;return p&&Number.isFinite(+p.latitude)&&Number.isFinite(+p.longitude)?[+p.latitude,+p.longitude]:null};
+function initMap(){map=L.map('map').setView([-15.8335,-48.0566],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map)}
+function filtered(){const q=$('search').value.toLowerCase(),cat=$('category').value;return all.filter(b=>(!q||[b.name,b.category,b.address?.street,b.address?.suburb].join(' ').toLowerCase().includes(q))&&(!cat||b.category===cat))}
+function select(id,zoom=true){active=id;const b=all.find(x=>x.id===id),p=coords(b);if(p&&zoom)map.setView(p,17);markers.forEach((m,k)=>m.setStyle({radius:k===id?8:5,fillOpacity:k===id?1:.75,weight:k===id?3:1}));document.querySelectorAll('.company-row').forEach(el=>el.classList.toggle('active',el.dataset.id===id));const row=document.querySelector('.company-row.active');if(row)row.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function render(){const items=filtered();$('resultCount').textContent=items.length+' resultados visíveis';$('list').innerHTML=items.slice(0,100).map(b=>'<div class="company-row p-3 '+(b.id===active?'active':'')+'" data-id="'+esc(b.id)+'"><div class="d-flex justify-content-between gap-2"><div class="fw-semibold">'+esc(b.name||'Sem nome')+'</div><span class="status-dot mt-2"></span></div><div class="tiny mt-1">'+esc(b.category||'Categoria não informada')+' · '+esc([b.address?.street,b.address?.number,b.address?.suburb].filter(Boolean).join(', ')||'Endereço incompleto')+'</div><div class="mt-2"><span class="badge pill">Pendente de conferência</span></div></div>').join('');document.querySelectorAll('.company-row').forEach(el=>el.addEventListener('click',()=>select(el.dataset.id)));$('total').textContent=all.length.toLocaleString('pt-BR');$('pending').textContent=all.length.toLocaleString('pt-BR');markers.forEach((m,id)=>m.setOpacity(items.some(b=>b.id===id)?1:.18));}
+async function load(){try{$('resultCount').textContent='Carregando…';const r=await fetch('../data/taguatinga/descobertas.json');if(!r.ok)throw Error('Não foi possível ler a base pública de Taguatinga.');const d=await r.json();all=d.establishments||[];markers.clear();if(map){map.remove();}initMap();all.forEach(b=>{const p=coords(b);if(!p)return;const m=L.circleMarker(p,{radius:5,color:'#173f35',fillColor:'#245648',fillOpacity:.75,weight:1}).addTo(map).bindPopup('<strong>'+esc(b.name)+'</strong><br>'+esc(b.category||'')+'<br><button class="btn btn-sm btn-success mt-2" onclick="window.__descomSelect(\''+esc(b.id)+'\')">Selecionar</button>');m.on('click',()=>select(b.id,false));markers.set(b.id,m)});window.__descomSelect=id=>select(id);const cats=[...new Set(all.map(x=>x.category).filter(Boolean))].sort();$('category').innerHTML='<option value="">Todas as categorias</option>'+cats.map(c=>'<option>'+esc(c)+'</option>').join('');render();if(markers.size)map.fitBounds(L.featureGroup([...markers.values()]).getBounds().pad(.08));}catch(e){$('resultCount').textContent=e.message}}
+$('search').addEventListener('input',render);$('category').addEventListener('change',render);$('clear').addEventListener('click',()=>{$('search').value='';$('category').value='';render()});$('reload').addEventListener('click',load);$('discover').addEventListener('click',()=>alert('Prévia visual: o comando real será conectado ao painel ASP e ao executor GitHub após a integração.'));$('locality').addEventListener('change',()=>alert('Esta prévia está carregando dados reais de Taguatinga. As demais localidades serão conectadas pelo painel integrado.'));load()})();
+</script>
+</body>
+</html>
