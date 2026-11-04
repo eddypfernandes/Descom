@@ -2,7 +2,7 @@
 
 **Atualizado em:** 04/11/2026  
 **Repositório:** `eddypfernandes/Descom`  
-**Commit de referência:** `5b0bb4ecd28cf7fc4bf82cea2b0f32b66bdd2ea5`
+**Último commit técnico:** `5579bcec07c87da3a4bb59d13c08e77f51adc56d`
 
 Este documento registra o estado confirmado do repositório. Requisitos não são tratados como implementação.
 
@@ -13,6 +13,7 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 - Scripts Python e documentação existentes: aproveitar como base.
 - `docs/revisao/operacao.html`: prévia visual anterior, preservada como referência.
 - `docs/central/index.html`: nova central administrativa DESCOM, criada separadamente. Interface responsiva com navegação, indicadores, mapa, filtros e listagem alimentados pelos JSON públicos do repositório. Não substitui os painéis anteriores.
+- `.github/workflows/modulo-pages.yml`: publicação ajustada para incluir `docs/central/` em `site/central/`, preservando o módulo comercial já publicado. O endereço previsto é `/Descom/central/`; a conclusão da publicação precisa ser confirmada no GitHub Pages.
 
 ## O que existe e foi confirmado no GitHub
 
