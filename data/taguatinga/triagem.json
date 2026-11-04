@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-11-04T01:09:56.144Z",
+  "region": "Taguatinga",
+  "uf": "DF",
+  "source": "OpenStreetMap",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "Open Database License (ODbL)",
+  "method": "Arquivo inicial para habilitar a revisão geográfica. Triagem ainda não executada.",
+  "limitations": [
+    "Os registros ainda não passaram pela triagem heurística.",
+    "Nenhum registro está confirmado para publicação ou importação.",
+    "A revisão humana continua obrigatória."
+  ],
+  "source_file": "descobertas.json",
+  "total_records": 0,
+  "decision_counts": {},
+  "records": []
+}
