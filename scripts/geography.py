@@ -1,7 +1,7 @@
-"""DESCOM: investigação preliminar de limites geográficos no OpenStreetMap.
+"""DESCOM: investigação geográfica preliminar via Nominatim/OSM.
 
-Esta rotina apenas produz candidatos para revisão humana. Ela nunca altera
-config/regions.json nem habilita a descoberta comercial automaticamente.
+Gera candidatos para revisão humana. Nunca altera config/regions.json
+nem habilita a descoberta comercial automaticamente.
 """
 from __future__ import annotations
 
@@ -20,13 +20,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "data" / "geography-pending"
-OVERPASS_ENDPOINTS = [
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.private.coffee/api/interpreter",
-]
 USER_AGENT = "DESCOM/1.0 (GUIA COMERCIAL; https://github.com/eddypfernandes/Descom)"
-TEMPORARY_HTTP_ERRORS = {429, 502, 503, 504}
 
 
 def now_iso() -> str:
@@ -39,63 +33,44 @@ def slugify(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", value).strip("-")
 
 
-def overpass(query: str) -> dict[str, Any]:
-    body = urllib.parse.urlencode({"data": query}).encode("utf-8")
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "Accept": "application/json",
-        "User-Agent": USER_AGENT,
-    }
-    failures: list[str] = []
-
-    for endpoint in OVERPASS_ENDPOINTS:
-        request = urllib.request.Request(endpoint, data=body, headers=headers, method="POST")
-        try:
-            with urllib.request.urlopen(request, timeout=100) as response:
-                payload = json.loads(response.read().decode("utf-8"))
-            if not isinstance(payload.get("elements"), list):
-                raise RuntimeError("Resposta do Overpass sem lista de elementos.")
-            return payload
-        except urllib.error.HTTPError as exc:
-            failures.append(f"{endpoint}: HTTP {exc.code}")
-            if exc.code not in TEMPORARY_HTTP_ERRORS:
-                continue
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-            failures.append(f"{endpoint}: {exc}")
-        time.sleep(2)
-
-    raise RuntimeError("Servidores Overpass indisponíveis: " + " | ".join(failures))
+def normalize(value: str) -> str:
+    value = unicodedata.normalize("NFKD", value.casefold())
+    return "".join(c for c in value if not unicodedata.combining(c))
 
 
-def find_federal_district_area() -> int:
-    query = """
-[out:json][timeout:45];
-area["name"~"^Distrito Federal$",i]["admin_level"="4"];
-out ids tags;
-"""
-    payload = overpass(query)
-    areas = payload.get("elements", [])
-    if not areas:
-        raise RuntimeError(
-            "Não foi possível identificar com segurança a área do Distrito Federal "
-            "no OpenStreetMap. Nenhum candidato foi gerado."
-        )
-    if len(areas) > 1:
-        raise RuntimeError(
-            f"Foram encontradas {len(areas)} áreas candidatas para o DF. "
-            "A identificação precisa de revisão antes de continuar."
-        )
-    area_id = areas[0].get("id")
-    if not isinstance(area_id, int):
-        raise RuntimeError("A área do Distrito Federal retornada não possui ID válido.")
-    return area_id
+def nominatim_search(name: str) -> list[dict[str, Any]]:
+    params = urllib.parse.urlencode({
+        "format": "jsonv2",
+        "q": f"{name}, Distrito Federal, Brasil",
+        "countrycodes": "br",
+        "addressdetails": 1,
+        "extratags": 1,
+        "namedetails": 1,
+        "polygon_geojson": 1,
+        "limit": 10,
+    })
+    request = urllib.request.Request(
+        f"https://nominatim.openstreetmap.org/search?{params}",
+        headers={
+            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=25) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"Nominatim respondeu HTTP {exc.code}.") from exc
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"Falha na consulta ao Nominatim: {exc}") from exc
+
+    if not isinstance(payload, list):
+        raise RuntimeError("Resposta do Nominatim em formato inesperado.")
+    return payload
 
 
-def area_id_for(element: dict[str, Any]) -> int | None:
-    osm_type = element.get("type")
-    osm_id = element.get("id")
-    if not isinstance(osm_id, int):
-        return None
+def area_id_for(osm_type: str, osm_id: int) -> int | None:
     if osm_type == "relation":
         return 3_600_000_000 + osm_id
     if osm_type == "way":
@@ -103,66 +78,92 @@ def area_id_for(element: dict[str, Any]) -> int | None:
     return None
 
 
-def center_for(element: dict[str, Any]) -> list[float] | None:
-    if isinstance(element.get("lat"), (int, float)) and isinstance(element.get("lon"), (int, float)):
-        return [float(element["lat"]), float(element["lon"])]
-    center = element.get("center") or {}
-    if isinstance(center.get("lat"), (int, float)) and isinstance(center.get("lon"), (int, float)):
-        return [float(center["lat"]), float(center["lon"])]
-    return None
-
-
-def find_candidates(name: str, df_area_id: int) -> list[dict[str, Any]]:
-    safe_name = re.escape(name.strip())
-    query = f"""
-[out:json][timeout:75];
-area({df_area_id})->.df;
-(
-  relation(area.df)["boundary"="administrative"]["name"~"^{safe_name}$",i];
-  way(area.df)["boundary"="administrative"]["name"~"^{safe_name}$",i];
-  relation(area.df)["place"~"^(suburb|town|village|neighbourhood)$"]["name"~"^{safe_name}$",i];
-  way(area.df)["place"~"^(suburb|town|village|neighbourhood)$"]["name"~"^{safe_name}$",i];
-  node(area.df)["place"~"^(suburb|town|village|neighbourhood)$"]["name"~"^{safe_name}$",i];
-);
-out center tags;
-"""
-    payload = overpass(query)
+def build_candidates(name: str, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
+    requested = normalize(name.strip())
 
-    for element in payload.get("elements", []):
-        tags = element.get("tags") or {}
-        osm_type = element.get("type")
-        osm_id = element.get("id")
-        if osm_type not in {"node", "way", "relation"} or not isinstance(osm_id, int):
+    for item in results:
+        address = item.get("address") or {}
+        state = str(address.get("state") or "")
+        country_code = str(address.get("country_code") or "").lower()
+        display_name = str(item.get("display_name") or "")
+        name_match = normalize(str(item.get("name") or "")) == requested
+        display_match = requested in normalize(display_name)
+
+        # Evita aceitar resultados homônimos de outra unidade federativa.
+        if country_code != "br":
+            continue
+        if "distrito federal" not in normalize(state) and not display_match:
+            continue
+        if not (name_match or display_match):
             continue
 
-        boundary = tags.get("boundary")
-        candidate_area_id = area_id_for(element) if boundary == "administrative" else None
-        center = center_for(element)
+        osm_type = str(item.get("osm_type") or "")
+        try:
+            osm_id = int(item.get("osm_id"))
+        except (TypeError, ValueError):
+            continue
+
+        category = str(item.get("category") or "")
+        place_type = str(item.get("type") or "")
+        extratags = item.get("extratags") or {}
+        geojson = item.get("geojson")
+        has_polygon = isinstance(geojson, dict) and geojson.get("type") in {
+            "Polygon", "MultiPolygon"
+        }
+        administrative_boundary = (
+            category == "boundary"
+            and place_type == "administrative"
+            and osm_type == "relation"
+            and has_polygon
+        )
+        try:
+            center = [float(item["lat"]), float(item["lon"])]
+        except (KeyError, TypeError, ValueError):
+            center = None
 
         candidates.append({
             "osm_type": osm_type,
             "osm_id": osm_id,
-            "name": tags.get("name") or name,
-            "boundary": boundary,
-            "admin_level": tags.get("admin_level"),
-            "place": tags.get("place"),
-            "area_id": candidate_area_id,
+            "name": item.get("name") or name,
+            "display_name": display_name,
+            "category": category,
+            "type": place_type,
+            "admin_level": extratags.get("admin_level"),
+            "place": extratags.get("place") or (place_type if category == "place" else None),
+            "area_id": area_id_for(osm_type, osm_id) if administrative_boundary else None,
             "center": center,
-            "usable_for_discovery": bool(candidate_area_id and center),
+            "boundingbox": item.get("boundingbox"),
+            "geojson": geojson if has_polygon else None,
+            "usable_for_discovery": administrative_boundary,
             "osm_url": f"https://www.openstreetmap.org/{osm_type}/{osm_id}",
-            "tags": tags,
+            "address": address,
+            "extratags": extratags,
+            "importance": item.get("importance"),
         })
 
     candidates.sort(
         key=lambda item: (
             not item["usable_for_discovery"],
             item["osm_type"] != "relation",
-            str(item.get("admin_level") or "99"),
+            -(float(item["importance"]) if item["importance"] is not None else 0),
             item["osm_id"],
         )
     )
     return candidates
+
+
+def save_result(name: str, uf: str, output: dict[str, Any]) -> Path:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_file = OUTPUT_DIR / f"{slugify(name)}-{uf.lower()}.json"
+    temporary_file = output_file.with_suffix(".json.tmp")
+    temporary_file.write_text(
+        json.dumps(output, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    json.loads(temporary_file.read_text(encoding="utf-8"))
+    temporary_file.replace(output_file)
+    return output_file
 
 
 def main() -> int:
@@ -182,47 +183,43 @@ def main() -> int:
         parser.error("Esta primeira versão investiga localidades do Distrito Federal (DF).")
 
     try:
-        df_area_id = find_federal_district_area()
-        candidates = find_candidates(name, df_area_id)
+        # Uma consulta direta ao Nominatim evita depender de múltiplas
+        # instâncias Overpass, que podem estar congestionadas.
+        results = nominatim_search(name)
+        time.sleep(1)  # Respeita o limite de uso do serviço público.
+        candidates = build_candidates(name, results)
 
+        usable = sum(1 for item in candidates if item["usable_for_discovery"])
         output = {
-            "schema_version": "1.0",
+            "schema_version": "1.1",
             "generated_at": now_iso(),
             "requested_locality": name,
             "uf": uf,
             "search_status": "candidates_found" if candidates else "no_candidates",
-            "source": "OpenStreetMap / Overpass API",
+            "source": "OpenStreetMap / Nominatim",
             "attribution": "© OpenStreetMap contributors",
             "license": "Open Database License (ODbL)",
-            "df_area_osm_id": df_area_id,
             "candidate_count": len(candidates),
+            "usable_boundary_count": usable,
             "review_required": True,
             "activation_allowed": False,
             "candidates": candidates,
             "message": (
-                "Candidatos para conferência humana. Nenhum limite foi aprovado "
-                "e nenhuma configuração de descoberta foi alterada."
+                "Candidatos para conferência humana. A existência de um resultado "
+                "não significa que seus limites representem a área comercial desejada. "
+                "Nenhuma região foi aprovada ou ativada."
             ),
         }
 
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        output_file = OUTPUT_DIR / f"{slugify(name)}-{uf.lower()}.json"
-        temporary_file = output_file.with_suffix(".json.tmp")
-        temporary_file.write_text(
-            json.dumps(output, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-        json.loads(temporary_file.read_text(encoding="utf-8"))
-        temporary_file.replace(output_file)
-
+        output_file = save_result(name, uf, output)
         print(f"Localidade: {name}/{uf}")
-        print(f"Candidatos encontrados: {len(candidates)}")
-        print(f"Candidatos com área OSM utilizável: {sum(1 for item in candidates if item['usable_for_discovery'])}")
+        print(f"Resultados compatíveis: {len(candidates)}")
+        print(f"Limites administrativos candidatos: {usable}")
         print(f"Resultado: {output_file.relative_to(ROOT)}")
         print("Nenhuma região foi ativada. A aprovação humana continua obrigatória.")
         return 0
 
-    except (OSError, ValueError, RuntimeError, urllib.error.URLError) as exc:
+    except (OSError, ValueError, RuntimeError) as exc:
         print(f"Investigação geográfica interrompida: {exc}", file=sys.stderr)
         return 1
 
