@@ -1,8 +1,8 @@
 # DESCOM — Estado atual e continuidade técnica
 
-**Atualizado em:** 04/11/2026  
+**Atualizado em:** 04/11/2026 — revisão após criação da nova central  
 **Repositório:** `eddypfernandes/Descom`  
-**Último commit técnico:** `5579bcec07c87da3a4bb59d13c08e77f51adc56d`
+**Último commit de referência antes desta atualização:** `b8474deb72fc6da85713bab1f4643ab953b93c52`
 
 Este documento registra o estado confirmado do repositório. Requisitos não são tratados como implementação.
 
@@ -13,6 +13,8 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 - Scripts Python e documentação existentes: aproveitar como base.
 - `docs/revisao/operacao.html`: prévia visual anterior, preservada como referência.
 - `docs/central/index.html`: nova central administrativa DESCOM, criada separadamente. Interface responsiva com navegação, indicadores, mapa, filtros e listagem alimentados pelos JSON públicos do repositório. Não substitui os painéis anteriores.
+- Banco Access: usuário confirmou como aprovadas as 11 tabelas e os relacionamentos apresentados.
+- Conexão ASP: usuário confirmou como aprovada a conexão `connAdao` com ACE OLEDB 12.0 e caminho `/bd/descom.accdb`.
 - `.github/workflows/modulo-pages.yml`: publicação ajustada para incluir `docs/central/` em `site/central/`, preservando o módulo comercial já publicado. O endereço previsto é `/Descom/central/`; a conclusão da publicação precisa ser confirmada no GitHub Pages.
 
 ## O que existe e foi confirmado no GitHub
