@@ -140,12 +140,20 @@ header{background:var(--gc-primary);color:#fff}
  function renderMap(items){
   markers.forEach(m=>map.removeLayer(m));markers=[];
   items.filter(coords).forEach(b=>{
-   const m=L.marker([b.location.latitude,b.location.longitude]).addTo(map);
+   const m=L.marker([Number(b.location.latitude),Number(b.location.longitude)]).addTo(map);
    m.bindPopup('<strong>'+esc(b.name)+'</strong><br>'+esc(b.category)+'<br><a href="'+esc(mapsUrl(b))+'" target="_blank" rel="noopener">Abrir no Google Maps</a>');
    m.on('click',()=>selectBusinessFromMap(b.id));
    m._businessId=b.id;markers.push(m);
   });
   if(markers.length){const group=L.featureGroup(markers);map.fitBounds(group.getBounds().pad(.12),{maxZoom:16});}
+ }
+ function refreshRegionMap(items){
+  const region=REGIONS[currentRegion];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   map.invalidateSize({pan:false});
+   map.setView(region.center,region.zoom);
+   renderMap(items);
+  }));
  }
  function renderList(){
   const items=filtered();$('result-count').textContent=items.length+' de '+businesses.length+' registros · '+items.filter(coords).length+' com coordenadas';
@@ -222,7 +230,7 @@ header{background:var(--gc-primary);color:#fff}
    readReviews();
    const cats=[...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
    cats.forEach(c=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(c)+'">'+esc(c)+'</option>'));
-   $('loading').classList.add('d-none');$('app').classList.remove('d-none');initMap();renderSummary();renderMap(businesses);renderList();
+   $('loading').classList.add('d-none');$('app').classList.remove('d-none');initMap();renderSummary();refreshRegionMap(businesses);renderList();
    ['search','category','decision','status'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{selectedMapId=null;renderMap(filtered());renderList()}));
    $('region').addEventListener('change',async()=>{
     const selected=$('region').value;
@@ -241,7 +249,7 @@ header{background:var(--gc-primary);color:#fff}
      [...new Set(businesses.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(cat=>$('category').insertAdjacentHTML('beforeend','<option value="'+esc(cat)+'">'+esc(cat)+'</option>'));
      $('search').value='';$('decision').value='';$('status').value='';
      $('loading').classList.add('d-none');$('app').classList.remove('d-none');
-     renderSummary();renderMap(businesses);renderList();
+     renderSummary();refreshRegionMap(businesses);renderList();
     }catch(err){$('loading').classList.add('d-none');$('error').textContent=err.message;$('error').classList.remove('d-none')}
    });
    $('clear').addEventListener('click',()=>{selectedMapId=null;['search','category','decision','status'].forEach(id=>$(id).value='');renderMap(businesses);renderList()});
