@@ -46,21 +46,21 @@ jobs:
 
       - name: Validar descobertas
         if: inputs.action == 'validate'
-        run: python scripts/main.py --validate --region "\${{ inputs.region }}"
+        run: python scripts/main.py --validate --region "${{ inputs.region }}"
 
       - name: Descobrir estabelecimentos
         if: inputs.action == 'discover'
-        run: python scripts/main.py --discover --region "\${{ inputs.region }}"
+        run: python scripts/main.py --discover --region "${{ inputs.region }}"
 
       - name: Executar triagem automática
         if: inputs.action == 'triage'
-        run: python scripts/triage.py --region "\${{ inputs.region }}"
+        run: python scripts/triage.py --region "${{ inputs.region }}"
 
       - name: Investigar configuração geográfica
         if: inputs.action == 'geography'
         env:
-          LOCALITY: "\${{ inputs.locality }}"
-          UF: "\${{ inputs.uf }}"
+          LOCALITY: "${{ inputs.locality }}"
+          UF: "${{ inputs.uf }}"
         run: |
           if [ -z "$LOCALITY" ]; then
             echo "::error::Informe o nome da localidade."
@@ -73,10 +73,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ "\${{ inputs.action }}" = "geography" ]; then
+          if [ "${{ inputs.action }}" = "geography" ]; then
             git add data/geography-pending/
           else
-            git add "data/\${{ inputs.region }}/descobertas.json" "data/\${{ inputs.region }}/triagem.json"
+            git add "data/${{ inputs.region }}/descobertas.json" "data/${{ inputs.region }}/triagem.json"
           fi
           if ! git diff --cached --quiet; then
             git commit -m "Atualiza resultados do DESCOM"
@@ -89,7 +89,7 @@ jobs:
         if: always() && inputs.action == 'triage' && hashFiles(format('data/{0}/triagem.json', inputs.region)) != ''
         uses: actions/upload-artifact@v4
         with:
-          name: descom-triagem-\${{ inputs.region }}
-          path: data/\${{ inputs.region }}/triagem.json
+          name: descom-triagem-${{ inputs.region }}
+          path: data/${{ inputs.region }}/triagem.json
           if-no-files-found: warn
           retention-days: 7
