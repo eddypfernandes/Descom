@@ -1,11 +1,11 @@
 {
   "execution_id": "85ddcb1bd7184786b1220805489417e4",
   "status": "EM_ANDAMENTO",
-  "stage": "Consultando OpenStreetMap",
+  "stage": "Analisando estabelecimentos encontrados",
   "total_areas": 1,
   "areas_completed": 0,
   "total_found": 0,
   "current_area": "NÚCLEO BANDEIRANTE / NÚCLEO BANDEIRANTE / DF",
-  "updated_at": "2026-11-07T02:50:09Z",
+  "updated_at": "2026-11-07T02:50:30Z",
   "error": null
 }
