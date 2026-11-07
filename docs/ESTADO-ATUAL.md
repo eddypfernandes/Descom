@@ -244,3 +244,10 @@ Esses refinamentos foram aprovados como direção, mas **não devem ser marcados
 7. Não declarar como concluída uma funcionalidade apenas porque foi desenhada ou descrita.
 
 **Regra principal deste marco: refinamento contínuo, não reconstrução. O DESCOM já está em andamento; a prioridade é fazê-lo avançar com segurança.**
+
+
+## Inventário de páginas e componentes (obrigatório durante desenvolvimento)
+
+O inventário técnico de páginas foi criado em [docs/INVENTARIO-PAGINAS-DESCOM.md](INVENTARIO-PAGINAS-DESCOM.md). Ele registra caminho, responsabilidade, dependências, endpoints, tabelas, situação de implementação e refinamentos pendentes. Toda página nova ou alteração relevante deverá atualizar esse inventário.
+
+O inventário distingue expressamente código compartilhado no chat/ambiente local de código efetivamente versionado no GitHub. Não presumir que páginas ASP estejam publicadas no repositório só porque existem no painel local. A partir deste marco, consultar o inventário antes de solicitar novamente códigos, caminhos ou informações já documentadas.
