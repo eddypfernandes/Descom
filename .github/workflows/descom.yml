@@ -62,6 +62,9 @@ jobs:
         run: python scripts/main.py --discover --region "${{ inputs.region }}"
       - name: Descoberta remota solicitada pelo painel DESCOM
         if: inputs.action == 'remote_discover'
+        env:
+          DESCOM_EXECUTION_ID: ${{ inputs.execution_id }}
+          DESCOM_AREAS_JSON: ${{ inputs.areas_json }}
         run: python scripts/remote_discover.py
       - name: Executar triagem automática
         if: inputs.action == 'triage'
@@ -83,7 +86,9 @@ jobs:
           if [ "${{ inputs.action }}" = "geography" ]; then
             git add data/geography-pending/
           elif [ "${{ inputs.action }}" = "remote_discover" ]; then
-            git add data/jobs/
+            if [ -d data/jobs ]; then
+              git add data/jobs/
+            fi
           else
             git add "data/${{ inputs.region }}/"
           fi
