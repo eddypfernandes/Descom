@@ -1,11 +1,11 @@
 {
   "execution_id": "6d87a55dcfb141a6b29624bd24b772c8",
   "status": "EM_ANDAMENTO",
-  "stage": "Consultando OpenStreetMap",
+  "stage": "Analisando estabelecimentos encontrados",
   "total_areas": 1,
   "areas_completed": 0,
   "total_found": 0,
   "current_area": "TAGUATINGA / TAGUATINGA / DF",
-  "updated_at": "2026-11-07T02:16:05Z",
+  "updated_at": "2026-11-07T02:16:51Z",
   "error": null
 }
