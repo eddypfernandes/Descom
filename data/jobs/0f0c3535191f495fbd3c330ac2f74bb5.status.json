@@ -1,11 +1,11 @@
 {
   "execution_id": "0f0c3535191f495fbd3c330ac2f74bb5",
-  "status": "EM_ANDAMENTO",
-  "stage": "Analisando estabelecimentos encontrados",
+  "status": "CONCLUIDA",
+  "stage": "Descoberta concluída; aguardando importação no DESCOM",
   "total_areas": 1,
-  "areas_completed": 0,
-  "total_found": 0,
-  "current_area": "NÚCLEO BANDEIRANTE / NÚCLEO BANDEIRANTE / DF",
-  "updated_at": "2026-11-07T02:09:50Z",
+  "areas_completed": 1,
+  "total_found": 139,
+  "current_area": "",
+  "updated_at": "2026-11-07T02:09:51Z",
   "error": null
 }
