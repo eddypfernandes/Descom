@@ -1,11 +1,11 @@
 {
   "execution_id": "3a12e3a2612342d39adaeb1749ee8fee",
-  "status": "EM_ANDAMENTO",
-  "stage": "Analisando estabelecimentos encontrados",
+  "status": "CONCLUIDA",
+  "stage": "Descoberta concluída; aguardando importação no DESCOM",
   "total_areas": 1,
-  "areas_completed": 0,
-  "total_found": 0,
-  "current_area": "TAGUATINGA / TAGUATINGA / DF",
-  "updated_at": "2026-11-07T02:45:17Z",
+  "areas_completed": 1,
+  "total_found": 633,
+  "current_area": "",
+  "updated_at": "2026-11-07T02:45:19Z",
   "error": null
 }
