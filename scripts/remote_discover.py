@@ -28,9 +28,31 @@ def save(path, data):
 def push_status(path, data, execution_id):
     save(path, data)
     subprocess.run(["git", "add", str(path.relative_to(ROOT))], cwd=ROOT, check=True)
-    if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=ROOT).returncode == 1:
-        subprocess.run(["git", "commit", "-m", f"DESCOM: andamento {execution_id}"], cwd=ROOT, check=True)
-        subprocess.run(["git", "push"], cwd=ROOT, check=True)
+
+    if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=ROOT).returncode != 1:
+        return
+
+    subprocess.run(
+        ["git", "commit", "-m", f"DESCOM: andamento {execution_id}"],
+        cwd=ROOT,
+        check=True,
+    )
+
+    # Outra execução ou automação pode atualizar main entre o checkout e o push.
+    # Reaplica o commit local sobre a versão remota e tenta publicar novamente.
+    last_error = None
+    for attempt in range(1, 4):
+        try:
+            subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=ROOT, check=True)
+            return
+        except subprocess.CalledProcessError as exc:
+            last_error = exc
+            if attempt == 3:
+                break
+            subprocess.run(["git", "fetch", "origin", "main"], cwd=ROOT, check=True)
+            subprocess.run(["git", "rebase", "origin/main"], cwd=ROOT, check=True)
+
+    raise RuntimeError(f"Não foi possível publicar o status após 3 tentativas: {last_error}")
 
 
 def main():
