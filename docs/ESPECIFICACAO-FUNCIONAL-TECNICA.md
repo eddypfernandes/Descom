@@ -434,3 +434,61 @@ A próxima entrega é a integração vertical mínima e funcional, nesta ordem:
 
 Não criar outro painel, outro banco, tabelas adicionais ou workflows redundantes. Não limpar JSONs nem recomeçar coleta. Não declarar o ciclo completo até que uma execução real seja disparada pelo painel, retorne ao ASP, grave no Access e apareça novamente na interface.
 
+
+
+---
+
+# ADENDO DE CONTINUIDADE — 07/11/2026
+
+Este adendo registra resultados operacionais confirmados e atualiza a distinção entre requisitos e implementação. Em caso de divergência com o texto histórico anterior, prevalece este registro para o estado da execução descrita.
+
+## 19. Descoberta e importação real — Taguatinga
+
+Foi concluída uma execução real para Taguatinga/DF:
+
+- Execução GitHub: `327c619084c441afa619a66f4fbbb585`.
+- `EXEC_ID`: `26`.
+- Arquivo de resultados: `data/jobs/327c619084c441afa619a66f4fbbb585.json`.
+- Total de registros no arquivo: **633 estabelecimentos**. A referência anterior a 139 registros era uma contagem incorreta e está superada.
+- Importação executada em **43 lotes** (42 lotes com 15 registros e o último com 3).
+- Retorno final: **633 processados; 632 novos; 1 existente; 0 erros**.
+- O registro já importado durante o teste individual foi reconhecido como existente pelo identificador OpenStreetMap, sem duplicação.
+- O usuário observou o modal atualizando o progresso dos lotes sem erros.
+
+### 19.1 Contrato confirmado de `importar.asp`
+
+O endpoint `/admin/descom/importar.asp` recebe o campo POST `linhas`. Cada registro é uma linha com 17 campos tabulados, na ordem: EXEC_ID, tipo OSM, ID OSM, nome, categoria, rua, número, bairro, telefone, e-mail, site, latitude, longitude, URL OSM, tags JSON, localidade e UF. O campo `exec_ids` contém os IDs de execução autorizados para o lote.
+
+Correções realizadas e validadas pela importação:
+
+- Conversão de latitude/longitude na função `SQLNumero` para formato numérico aceito pelo Access.
+- Extração de rua, número e bairro do objeto `address` do JSON antes de montar os campos tabulados. Não enviar o objeto diretamente como texto.
+- Diagnóstico do SQL real no INSERT de `cad_estabelecimentos` e correção do problema de quantidade/formatação dos valores.
+- Emissão de booleanos JSON literais válidos `true` e `false` no campo `finalizado`.
+- A operação demonstrou idempotência para o identificador OSM testado: a segunda passagem reconheceu o registro existente.
+
+### 19.2 Situação do mapa após a importação
+
+O usuário confirmou que uma consulta ao banco retorna latitude e longitude. Isso confirma a disponibilidade das coordenadas na camada de dados, mas **não comprova que o JavaScript esteja recebendo os registros ou que o Leaflet esteja renderizando os marcadores**. A visualização dos 633 estabelecimentos no mapa permanece pendente de teste.
+
+Próximo diagnóstico, sem alterar a importação já validada:
+
+1. Verificar a consulta Access executada por `descobrir.asp`.
+2. Verificar o formato e o conteúdo da resposta ASP/JSON.
+3. Verificar se o JavaScript recebe os registros e converte coordenadas em números válidos.
+4. Verificar a criação dos marcadores e o enquadramento do mapa Leaflet.
+5. Confirmar a sincronização entre seleção na lista e no mapa.
+
+### 19.3 Recuperação de execuções e importação pela interface
+
+A interface atual ainda não possui uma ação visual implementada para recuperar resultados de execuções anteriores do GitHub e importá-los. A execução de Taguatinga foi importada por um procedimento de Console usado para diagnóstico; esse procedimento não deve ser considerado a solução operacional definitiva.
+
+Requisito de implementação: adicionar à interface DESCOM uma área de execuções/resultados anteriores, com identificação da localidade, execução e quantidade de registros, ação de importar, progresso por lotes, contadores de novos/existentes/erros e interrupção segura em caso de falha. O processo deve reutilizar o endpoint e o contrato de importação já validados, sem exigir Console.
+
+### 19.4 Próxima sequência operacional
+
+1. Validar a exibição dos estabelecimentos importados de Taguatinga no mapa Leaflet.
+2. Implementar recuperação/importação de execuções anteriores pela interface.
+3. Importar os resultados já existentes do Núcleo Bandeirante pelo painel, sem iniciar nova descoberta.
+
+Não repetir a coleta de Taguatinga nem importar novamente seus 633 registros. Preservar os dados existentes e a interface aprovada.
