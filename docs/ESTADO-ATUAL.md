@@ -53,3 +53,45 @@ Este documento registra o estado confirmado do repositório. Requisitos não sã
 ## Próxima ação objetiva
 
 Próxima etapa: integrar a central administrativa ao ambiente ASP e conectar, por uma integração autenticada única, o painel ao GitHub Actions e o retorno das execuções ao Access. A estrutura das 11 tabelas e a conexão foram consideradas aprovadas pelo usuário. Preservar os dados e os painéis anteriores.
+
+
+## Registro de continuidade — 07/11/2026 (importação Taguatinga e diagnóstico do mapa)
+
+### Resultado confirmado da descoberta e importação
+
+- Localidade: Taguatinga/DF.
+- Execução GitHub: `327c619084c441afa619a66f4fbbb585`.
+- Identificador operacional da execução: `EXEC_ID = 26`.
+- Arquivo de resultados: `data/jobs/327c619084c441afa619a66f4fbbb585.json`.
+- O arquivo contém **633 estabelecimentos**. A contagem inicial de 139 mencionada durante o diagnóstico estava incorreta e fica substituída por esta contagem confirmada.
+- Importação concluída em **43 lotes** de até 15 registros (42 lotes de 15 e o último com 3).
+- Resultado final retornado pelo importador: **633 processados, 632 novos, 1 existente, 0 erros**.
+- O registro existente é o estabelecimento já gravado no teste individual. A verificação pelo identificador OSM evitou duplicação.
+- O modal do painel foi observado pelo usuário atualizando o progresso dos lotes sem erro.
+
+### Correções confirmadas no importador Classic ASP
+
+- O contrato real de entrada de `/admin/descom/importar.asp` usa o campo POST **`linhas`**, não `dados`.
+- Cada linha contém 17 campos separados por tabulação, nesta ordem: `EXEC_ID`, tipo OSM, ID OSM, nome, categoria, rua, número, bairro, telefone, e-mail, site, latitude, longitude, URL OSM, tags JSON, localidade e UF.
+- A função `SQLNumero` foi corrigida para converter coordenadas decimais para o formato numérico SQL aceito pelo Access. Após a correção, latitude e longitude passaram a ser gravadas e o INSERT foi concluído.
+- O JSON de origem fornece `address` como objeto em alguns registros. A montagem dos lotes deve extrair rua, número e bairro desse objeto antes de montar os campos tabulados; não converter o objeto diretamente para texto (o que gera `[object Object]`).
+- A resposta de finalização foi corrigida para emitir booleanos JSON válidos (`true`/`false`), em vez dos literais localizados do VBScript (`Verdadeiro`/`Falso`).
+- O INSERT em `cad_estabelecimentos` foi diagnosticado com SQL real e passou a funcionar no teste individual e na importação completa.
+
+### Situação da interface e do mapa
+
+- A importação dos 633 registros para o banco operacional foi concluída sem erros.
+- O usuário confirmou que a consulta ao banco retorna latitude e longitude para os estabelecimentos.
+- **Ainda não está confirmado que os 633 registros sejam entregues ao JavaScript nem que os marcadores sejam criados/exibidos pelo Leaflet.** O mapa ainda não foi validado com esses registros importados.
+- A interface atual não oferece uma função visual para recuperar uma execução anterior do GitHub e importar seus resultados. A importação desta execução foi concluída por código executado no Console do navegador; isso é procedimento de diagnóstico pontual, não fluxo operacional aceitável.
+- Requisito imediato: implementar na interface DESCOM uma área de execuções/resultados anteriores e ação de importação com progresso por lotes, contadores e tratamento de falhas, sem exigir Console.
+
+### Próximas etapas confirmadas
+
+1. Inspecionar o código atualizado de `/admin/descom/descobrir.asp` e identificar a consulta que fornece os estabelecimentos ao mapa.
+2. Verificar a cadeia completa: consulta Access → resposta ASP/JSON → JavaScript → criação dos marcadores Leaflet.
+3. Exibir no mapa os estabelecimentos importados de Taguatinga, mantendo lista e marcadores sincronizados e preservando o layout aprovado.
+4. Implementar a recuperação/importação de execuções anteriores pela interface, sem Console.
+5. Importar os resultados já existentes do Núcleo Bandeirante pelo painel, sem repetir a descoberta, depois que o fluxo de interface estiver pronto.
+
+Não repetir a descoberta de Taguatinga nem reexecutar a importação dos 633 registros. Os dados já foram importados. Não alterar o banco ou a rotina de importação sem necessidade demonstrada.
