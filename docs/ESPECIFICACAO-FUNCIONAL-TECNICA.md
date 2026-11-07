@@ -643,3 +643,10 @@ Uma melhoria é aceita quando:
 - teve o estado real registrado no dossiê.
 
 **Princípio final: avançar continuamente por refinamentos pequenos e verificáveis. Não reconstruir o que já está construído e funcionando.**
+
+
+## Rastreabilidade de páginas e arquivos durante o desenvolvimento
+
+Consultar e manter o [Inventário técnico de páginas e arquivos DESCOM](INVENTARIO-PAGINAS-DESCOM.md) como documento obrigatório de apoio à especificação. Toda página, include, endpoint ou componente novo deve ter sua responsabilidade, dependências, contratos, tabelas e estado de validação registrados no inventário.
+
+O inventário é complementar à especificação: não substitui o código-fonte nem o dossiê de decisões. Não solicitar novamente ao usuário informações já registradas sem antes consultar esses documentos. Quando o código não estiver versionado no GitHub, registrar essa condição de forma explícita.
