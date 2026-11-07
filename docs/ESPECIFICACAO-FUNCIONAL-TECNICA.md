@@ -492,3 +492,154 @@ Requisito de implementação: adicionar à interface DESCOM uma área de execuç
 3. Importar os resultados já existentes do Núcleo Bandeirante pelo painel, sem iniciar nova descoberta.
 
 Não repetir a coleta de Taguatinga nem importar novamente seus 633 registros. Preservar os dados existentes e a interface aprovada.
+
+
+---
+
+# ADENDO DE ESPECIFICAÇÃO — 07/11/2026
+## Fluxo operacional mestre e política de refinamento contínuo
+
+Este adendo registra a decisão funcional mais recente do projeto e prevalece sobre qualquer trecho histórico que possa ser interpretado como autorização para reconstruir o painel, substituir rotinas ou reiniciar o desenvolvimento.
+
+## 1. Regra de evolução
+
+O DESCOM já está em andamento. Daqui em diante, **tudo o que foi construído e funciona será mantido**. O trabalho consiste em refinamentos pontuais, correções necessárias e melhorias incrementais.
+
+É vedado, sem autorização expressa e justificativa técnica demonstrada:
+
+- Reconstruir o painel ou recomeçar módulos concluídos.
+- Recriar tabelas, bancos, relacionamentos ou cadastros já existentes.
+- Substituir processos funcionais por novas implementações redundantes.
+- Remover dados, históricos, identificadores ou rotinas validadas.
+- Alterar partes do código que não sejam necessárias ao refinamento solicitado.
+
+Toda implementação deve partir do arquivo e da estrutura atualmente em uso. O estado de cada item deve ser identificado como deliberado, implementado, testado ou publicado; nunca promover requisito planejado à condição de funcionalidade concluída.
+
+## 2. Experiência operacional desejada
+
+O administrador master acessa o site e entra na área Comercial/DESCOM. No primeiro uso, o banco pode não conter localidades. A tela apresenta o link **Adicionar local** imediatamente acima do dropdown de localidades. O dropdown fica vazio e os controles de aprovação e descoberta permanecem indisponíveis.
+
+### 2.1 Cadastro de localidade
+
+- O link abre um modal.
+- O formulário exige somente nome da cidade/região e sigla da UF.
+- O modal mantém uma lista rolável das localidades já cadastradas.
+- A lista permitirá selecionar uma localidade para edição ou exclusão.
+- O cadastro atualiza a lista do modal e o dropdown da tela principal sem recarregar ou sair da página.
+- Após cadastrar, a localidade pode ser selecionada automaticamente e a identificação territorial é iniciada.
+
+Edição e exclusão devem respeitar dependências. Antes de implementar exclusão, verificar se existem áreas, execuções, estabelecimentos, evidências, tarefas ou histórico associados. Não executar exclusão em cascata de dados históricos. Se houver dependências, preferir impedir exclusão física e oferecer arquivamento/inativação com explicação clara. A política definitiva será deliberada antes da implementação.
+
+### 2.2 Identificação e confirmação da área
+
+- A seleção da localidade aciona a identificação geográfica já existente.
+- O limite administrativo encontrado é desenhado no mapa Leaflet.
+- Antes da primeira descoberta, a área pode estar vazia de marcadores; esse estado é normal.
+- O administrador confere a geometria e poderá ajustá-la quando o recurso de edição estiver disponível.
+- **Confirmar área** aparece somente depois que uma geometria válida foi identificada e enquanto a área ainda não estiver aprovada.
+- Ao confirmar, a área é persistida. O controle de confirmação desaparece e não deve voltar a ser oferecido para uma área já aprovada.
+- A geometria aprovada deve ser recuperada do banco nas próximas visitas; uma nova consulta geográfica não pode sobrescrevê-la silenciosamente.
+
+O campo visual **Território identificado** será removido por ser redundante com o dropdown. A identificação automática permanece; remove-se apenas a apresentação repetida do nome.
+
+### 2.3 Descoberta
+
+- Depois da aprovação territorial, **Descobrir empresas** aparece somente se a descoberta ainda não tiver sido concluída para o contexto selecionado.
+- O botão reutiliza o pipeline e os endpoints existentes. Não reconstruir a coleta, o importador nem a integração que já funciona.
+- Durante uma execução, a interface apresenta feedback de estado/progresso e impede disparos duplicados.
+- Quando a operação termina, os estabelecimentos persistidos aparecem no mapa e na lista.
+- Se a descoberta falhar ou for cancelada, mostrar o estado e permitir nova tentativa controlada, preservando histórico e resultados parciais.
+
+### 2.4 Mapa e lista
+
+- Em desktop, mapa à esquerda ocupando a maior parte da largura e lista à direita.
+- Em celular, mapa primeiro e lista abaixo, ambos responsivos.
+- Mapa com altura confortável; lista com rolagem independente.
+- Clique no item da lista seleciona o marcador e centraliza o mapa.
+- Clique no marcador seleciona o item correspondente e o posiciona na área visível da lista, preferencialmente no topo do painel rolável.
+- A seleção não remove os demais marcadores nem apaga o contexto geográfico.
+- Marcadores e lista representam o mesmo conjunto de registros persistidos.
+
+### 2.5 Investigação aprofundada
+
+Cada estabelecimento deverá oferecer **Buscar mais detalhes** tanto no item da lista quanto no popup do marcador.
+
+A ação utiliza o ID do estabelecimento selecionado, sem ambiguidade. ADÃO pesquisa fontes públicas permitidas e pode buscar nome empresarial/fantasia, CNPJ quando disponível, endereço, telefone, e-mail, site, redes sociais e outros dados comerciais úteis.
+
+A interface abre um modal de acompanhamento com spinner e mensagens de feedback. A investigação deve ser assíncrona e não bloquear o restante do painel. Cada dado candidato mantém, quando disponível, valor, fonte/URL, data da coleta e grau de confiança. Não associar dados a homônimos sem evidência suficiente e não sobrescrever automaticamente dados já aprovados.
+
+### 2.6 Cadastro no Guia Comercial
+
+Após a investigação, o sistema poderá abrir a página de cadastro da empresa no site com os campos encontrados pré-preenchidos. O administrador revisa, corrige e decide o que será aceito.
+
+Descoberta, enriquecimento, validação e publicação são etapas diferentes. A tabela cad_estabelecimentos do DESCOM poderá alimentar o módulo home_empresa.asp, mas somente registros que atendam aos critérios de validação/publicação definidos pelo Guia Comercial. Não publicar automaticamente todos os registros brutos descobertos.
+
+## 3. Estados independentes e progressão da interface
+
+O sistema deve manter separados:
+
+**Estado territorial**
+- Sem área identificada.
+- Identificada, aguardando confirmação.
+- Aprovada.
+
+**Estado da investigação**
+- Não iniciada.
+- Em andamento.
+- Concluída.
+- Falhou/cancelada.
+
+A interface deriva os controles desses estados persistidos:
+
+| Condição | Exibição esperada |
+|---|---|
+| Nenhuma localidade | Adicionar local e dropdown vazio; controles operacionais indisponíveis. |
+| Localidade selecionada, sem geometria | Feedback da identificação; sem botão de confirmação. |
+| Geometria válida ainda não aprovada | Confirmar área. |
+| Área aprovada, descoberta não iniciada | Descobrir empresas; sem confirmação ou salvar área. |
+| Descoberta em andamento | Feedback/progresso; bloquear nova solicitação duplicada. |
+| Descoberta concluída | Mapa, lista e Buscar mais detalhes; ocultar controles iniciais de confirmação e descoberta. |
+| Descoberta falhou/cancelada | Mostrar falha e permitir tentar novamente sem perder histórico. |
+
+O sistema deve apresentar apenas a próxima ação necessária, não solicitar novamente uma etapa já concluída.
+
+## 4. Persistência e integridade
+
+Os estados não podem ser inferidos apenas pela presença de marcadores na página ou por variáveis JavaScript. Devem ser consultados a partir dos registros existentes no Access e das relações já estabelecidas entre localidade, área, execução, estabelecimento e evidência.
+
+Antes de alterar consultas ou tabelas:
+1. Inspecionar a estrutura real do SYS_DESCOM e o código em uso.
+2. Reutilizar as tabelas e relacionamentos existentes.
+3. Não criar uma segunda estrutura para representar entidades já cadastradas.
+4. Preservar execuções anteriores, evidências, identificadores e histórico.
+5. Distinguir uma descoberta sem resultados de uma descoberta que nunca foi executada.
+6. Distinguir execução em andamento de execução concluída ou falha.
+
+A estrutura de banco e os contratos de importação já validados não devem ser alterados por conveniência visual.
+
+## 5. Escopo dos próximos refinamentos
+
+Os primeiros refinamentos acordados para areas.asp são:
+
+1. Retirar o campo redundante Território identificado.
+2. Manter Adicionar local acima do dropdown.
+3. Organizar mapa e lista lado a lado no desktop e empilhados no celular.
+4. Tornar a lista rolável independentemente.
+5. Condicionar Confirmar área, salvar e Descobrir empresas aos estados reais do território e da investigação.
+6. Preservar o modal, o cadastro AJAX, a identificação geográfica, o SQL de estabelecimentos, os marcadores, a sincronização, iniciar.asp e importar.asp.
+7. Planejar edição/exclusão de localidades com proteção de integridade antes de implementar.
+
+Esses pontos estão **deliberados**, mas não devem ser classificados como implementados ou testados até que o código seja alterado e validado.
+
+## 6. Critério de aceite geral
+
+Uma melhoria é aceita quando:
+- resolve somente o problema solicitado;
+- preserva as funcionalidades já existentes;
+- não duplica dados nem estruturas;
+- mantém o histórico e a integridade;
+- funciona no desktop e no celular quando envolver interface;
+- foi testada na etapa correspondente;
+- teve o estado real registrado no dossiê.
+
+**Princípio final: avançar continuamente por refinamentos pequenos e verificáveis. Não reconstruir o que já está construído e funcionando.**
